@@ -1,7 +1,7 @@
 module Main exposing (Model, Msg, main)
 
 import Browser
-import Html exposing (Html, button, h3, main_, p, text)
+import Html exposing (Html, button, main_, p, text)
 import Html.Attributes
 import Html.Events exposing (onClick)
 import Ports
@@ -31,8 +31,6 @@ init flags =
 
 type Msg
     = Increment
-    | Decrement
-    | Reset
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -43,16 +41,6 @@ update msg model =
             , Ports.storeCount (model + 1)
             )
 
-        Decrement ->
-            ( model - 1
-            , Ports.storeCount (model - 1)
-            )
-
-        Reset ->
-            ( 0
-            , Ports.storeCount 0
-            )
-
 
 
 -- VIEW
@@ -61,13 +49,8 @@ update msg model =
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        [ h3 [] [ text "Elm counter" ]
-        , p [] [ text <| String.fromInt model ]
-        , Html.div [ Html.Attributes.class "counter-controls" ]
-            [ button [ onClick Increment ] [ text "+" ]
-            , button [ onClick Decrement ] [ text "-" ]
-            , button [ onClick Reset ] [ text "Reset" ]
-            ]
+        [ p [] [ text <| "Inventory: " ++ String.fromInt model ]
+        , button [ onClick Increment ] [ text "Click" ]
         ]
 
 
