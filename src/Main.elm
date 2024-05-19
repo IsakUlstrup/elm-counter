@@ -49,8 +49,8 @@ update msg model =
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        [ p [] [ text <| "Inventory: " ++ String.fromInt model ]
-        , button [ onClick Increment ] [ text "Click" ]
+        [ Html.div [ Html.Attributes.class "buttons" ] [ button [ onClick Increment ] [ text "Click" ] ]
+        , Html.div [ Html.Attributes.class "player-stats" ] [ p [] [ text <| "Inventory: " ++ String.fromInt model ] ]
         ]
 
 
