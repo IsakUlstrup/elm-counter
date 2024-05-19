@@ -4,6 +4,7 @@ import Browser
 import Html exposing (Html, button, h3, main_, p, text)
 import Html.Attributes
 import Html.Events exposing (onClick)
+import Ports
 
 
 
@@ -14,9 +15,14 @@ type alias Model =
     Int
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( 0, Cmd.none )
+init : Maybe Int -> ( Model, Cmd Msg )
+init flags =
+    case flags of
+        Just count ->
+            ( count, Cmd.none )
+
+        Nothing ->
+            ( 0, Cmd.none )
 
 
 
@@ -33,13 +39,19 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Increment ->
-            ( model + 1, Cmd.none )
+            ( model + 1
+            , Ports.storeCount (model + 1)
+            )
 
         Decrement ->
-            ( model - 1, Cmd.none )
+            ( model - 1
+            , Ports.storeCount (model - 1)
+            )
 
         Reset ->
-            ( 0, Cmd.none )
+            ( 0
+            , Ports.storeCount 0
+            )
 
 
 
@@ -72,7 +84,7 @@ subscriptions _ =
 -- MAIN
 
 
-main : Program () Model Msg
+main : Program (Maybe Int) Model Msg
 main =
     Browser.element
         { init = init
