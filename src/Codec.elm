@@ -35,15 +35,11 @@ encodeInventory inventory =
 
 
 decodeInventory : Maybe String -> Inventory
-decodeInventory input =
-    case input of
+decodeInventory maybeInput =
+    case maybeInput of
         Just inputString ->
-            case Decode.decodeString inventoryDecoder inputString of
-                Ok inv ->
-                    inv
-
-                Err _ ->
-                    Inventory.empty
+            Decode.decodeString inventoryDecoder inputString
+                |> Result.withDefault Inventory.empty
 
         Nothing ->
             Inventory.empty
