@@ -1,6 +1,7 @@
 module Main exposing (Model, Msg, main)
 
 import Browser
+import Codec
 import Engine.Inventory as Inventory exposing (Inventory)
 import Html exposing (Html, button, main_, text)
 import Html.Attributes
@@ -16,14 +17,9 @@ type alias Model =
     Inventory
 
 
-init : Maybe Int -> ( Model, Cmd Msg )
+init : Maybe String -> ( Model, Cmd Msg )
 init flags =
-    case flags of
-        Just _ ->
-            ( Inventory.empty, Cmd.none )
-
-        Nothing ->
-            ( Inventory.empty, Cmd.none )
+    ( Codec.decodeInventory flags, Cmd.none )
 
 
 
@@ -43,7 +39,7 @@ update msg model =
                     Inventory.addItem "Test" 1 model
             in
             ( newInventory
-            , Ports.storeCount 0
+            , Ports.storeInventory (Codec.encodeInventory newInventory)
             )
 
 
@@ -78,7 +74,7 @@ subscriptions _ =
 -- MAIN
 
 
-main : Program (Maybe Int) Model Msg
+main : Program (Maybe String) Model Msg
 main =
     Browser.element
         { init = init

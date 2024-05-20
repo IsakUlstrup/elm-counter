@@ -1,4 +1,4 @@
-port module Ports exposing (storeCount)
+port module Ports exposing (storeInventory)
 
 
-port storeCount : Int -> Cmd msg
+port storeInventory : String -> Cmd msg

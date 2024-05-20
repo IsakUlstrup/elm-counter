@@ -1,4 +1,4 @@
-module Engine.Inventory exposing (Inventory, addItem, empty, toList)
+module Engine.Inventory exposing (Inventory, addItem, empty, fromList, toList)
 
 import Dict exposing (Dict)
 
@@ -24,6 +24,11 @@ addItem itemName amount (Inv inventory) =
 
     else
         Inv inventory
+
+
+fromList : List ( String, Int ) -> Inventory
+fromList list =
+    Inv <| Dict.fromList list
 
 
 toList : Inventory -> List ( String, Int )
