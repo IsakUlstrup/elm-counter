@@ -1,7 +1,8 @@
 module Main exposing (Model, Msg, main)
 
 import Browser
-import Html exposing (Html, button, main_, p, text)
+import Engine.Inventory as Inventory exposing (Inventory)
+import Html exposing (Html, button, main_, text)
 import Html.Attributes
 import Html.Events exposing (onClick)
 import Ports
@@ -12,17 +13,17 @@ import Ports
 
 
 type alias Model =
-    Int
+    Inventory
 
 
 init : Maybe Int -> ( Model, Cmd Msg )
 init flags =
     case flags of
-        Just count ->
-            ( count, Cmd.none )
+        Just _ ->
+            ( Inventory.empty, Cmd.none )
 
         Nothing ->
-            ( 0, Cmd.none )
+            ( Inventory.empty, Cmd.none )
 
 
 
@@ -37,8 +38,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Increment ->
-            ( model + 1
-            , Ports.storeCount (model + 1)
+            let
+                newInventory =
+                    Inventory.addItem "Test" 1 model
+            in
+            ( newInventory
+            , Ports.storeCount 0
             )
 
 
@@ -46,11 +51,17 @@ update msg model =
 -- VIEW
 
 
+viewItem : ( String, Int ) -> Html msg
+viewItem ( itemName, amount ) =
+    Html.div [ Html.Attributes.class "item" ] [ Html.p [] [ Html.text (itemName ++ " (" ++ String.fromInt amount ++ ")") ] ]
+
+
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        [ Html.div [ Html.Attributes.class "buttons" ] [ button [ onClick Increment ] [ text "Click" ] ]
-        , Html.div [ Html.Attributes.class "player-stats" ] [ p [] [ text <| "Inventory: " ++ String.fromInt model ] ]
+        [ Html.div [ Html.Attributes.class "buttons" ] [ button [ onClick Increment ] [ text "Test" ] ]
+        , Html.div [ Html.Attributes.class "inventory" ]
+            (model |> Inventory.toList |> List.map viewItem)
         ]
 
 
