@@ -16,23 +16,27 @@ empty =
         }
 
 
+addHistory : ( String, Int ) -> Inventory -> Inventory
+addHistory ( itemName, amount ) (Inv inventory) =
+    Inv <| { inventory | history = Array.push ( itemName, amount ) inventory.history }
+
+
 addItem : String -> Int -> Inventory -> Inventory
 addItem itemName amount (Inv inventory) =
     if amount > 0 then
-        case Dict.get itemName inventory.items of
+        (case Dict.get itemName inventory.items of
             Just _ ->
-                Inv <|
-                    { inventory
-                        | items = Dict.update itemName (Maybe.map (\item -> item + amount)) inventory.items
-                        , history = Array.push ( itemName, amount ) inventory.history
-                    }
+                { inventory
+                    | items = Dict.update itemName (Maybe.map (\item -> item + amount)) inventory.items
+                }
 
             Nothing ->
-                Inv <|
-                    { inventory
-                        | items = Dict.insert itemName amount inventory.items
-                        , history = Array.push ( itemName, amount ) inventory.history
-                    }
+                { inventory
+                    | items = Dict.insert itemName amount inventory.items
+                }
+        )
+            |> Inv
+            |> addHistory ( itemName, amount )
 
     else
         Inv inventory
