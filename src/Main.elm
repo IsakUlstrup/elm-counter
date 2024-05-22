@@ -65,8 +65,8 @@ viewInventory inventory =
         (inventory |> Inventory.toList |> List.map viewItem)
 
 
-viewHistoryItem : ( Int, ( String, Int ) ) -> Html msg
-viewHistoryItem ( index, ( itemName, amount ) ) =
+viewHistoryItem : ( String, Int ) -> Html msg
+viewHistoryItem ( itemName, amount ) =
     Html.p [] [ Html.text (String.fromInt amount ++ " " ++ itemName) ]
 
 

@@ -48,6 +48,6 @@ toList (Inv inventory) =
     Dict.toList inventory.items
 
 
-historyToList : Inventory -> List ( Int, ( String, Int ) )
+historyToList : Inventory -> List ( String, Int )
 historyToList (Inv inventory) =
-    Array.toIndexedList inventory.history
+    Array.toList inventory.history
