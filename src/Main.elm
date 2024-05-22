@@ -75,8 +75,10 @@ view model =
     main_ [ Html.Attributes.id "app" ]
         [ Html.div [ Html.Attributes.class "buttons" ] [ button [ onClick Increment ] [ text "Test" ] ]
         , Html.div [ Html.Attributes.class "player-stats" ]
-            [ Html.button [ Html.Attributes.attribute "popovertarget" "player-inventory" ] [ Html.text "Inventory" ]
-            , Html.div [ Html.Attributes.class "inventory-history" ] (model |> Inventory.historyToList |> List.map viewHistoryItem)
+            [ Html.button [ Html.Attributes.attribute "popovertarget" "player-inventory" ]
+                [ Html.text "Inventory"
+                , Html.div [ Html.Attributes.class "inventory-history" ] (model |> Inventory.historyToList |> List.map viewHistoryItem)
+                ]
             , viewInventory model
             ]
         ]
