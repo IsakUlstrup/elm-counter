@@ -49,15 +49,29 @@ update msg model =
 
 viewItem : ( String, Int ) -> Html msg
 viewItem ( itemName, amount ) =
-    Html.div [ Html.Attributes.class "item" ] [ Html.p [] [ Html.text (itemName ++ " (" ++ String.fromInt amount ++ ")") ] ]
+    Html.div [ Html.Attributes.class "item" ]
+        [ Html.p [] [ Html.text itemName ]
+        , Html.sup [] [ Html.text (String.fromInt amount) ]
+        ]
+
+
+viewInventory : Inventory -> Html msg
+viewInventory inventory =
+    Html.div
+        [ Html.Attributes.id "player-inventory"
+        , Html.Attributes.attribute "popover" ""
+        ]
+        (inventory |> Inventory.toList |> List.map viewItem)
 
 
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
         [ Html.div [ Html.Attributes.class "buttons" ] [ button [ onClick Increment ] [ text "Test" ] ]
-        , Html.div [ Html.Attributes.class "inventory" ]
-            (model |> Inventory.toList |> List.map viewItem)
+        , Html.div [ Html.Attributes.class "player-stats" ]
+            [ Html.button [ Html.Attributes.attribute "popovertarget" "player-inventory" ] [ Html.text "Inventory" ]
+            , viewInventory model
+            ]
         ]
 
 
