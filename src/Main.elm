@@ -35,6 +35,7 @@ update msg model =
     case msg of
         Increment ->
             let
+                newInventory : Inventory
                 newInventory =
                     Inventory.addItem "Test" 1 model
             in

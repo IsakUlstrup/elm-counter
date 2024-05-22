@@ -19,6 +19,7 @@ inventory =
             , fuzz int "Add random amount of an item, numbers below 1 should be ignored" <|
                 \randomAmount ->
                     let
+                        expectList : List ( String, Int )
                         expectList =
                             if randomAmount > 0 then
                                 [ ( "Test", randomAmount ) ]

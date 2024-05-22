@@ -23,7 +23,7 @@ itemDecoder =
 inventoryDecoder : Decoder Inventory
 inventoryDecoder =
     Decode.list itemDecoder
-        |> Decode.andThen (Inventory.fromList >> Decode.succeed)
+        |> Decode.map Inventory.fromList
 
 
 encodeInventory : Inventory -> String
