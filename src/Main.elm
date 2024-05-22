@@ -65,12 +65,18 @@ viewInventory inventory =
         (inventory |> Inventory.toList |> List.map viewItem)
 
 
+viewHistoryItem : ( Int, ( String, Int ) ) -> Html msg
+viewHistoryItem ( index, ( itemName, amount ) ) =
+    Html.p [] [ Html.text (String.fromInt amount ++ " " ++ itemName) ]
+
+
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
         [ Html.div [ Html.Attributes.class "buttons" ] [ button [ onClick Increment ] [ text "Test" ] ]
         , Html.div [ Html.Attributes.class "player-stats" ]
             [ Html.button [ Html.Attributes.attribute "popovertarget" "player-inventory" ] [ Html.text "Inventory" ]
+            , Html.div [ Html.Attributes.class "inventory-history" ] (model |> Inventory.historyToList |> List.map viewHistoryItem)
             , viewInventory model
             ]
         ]

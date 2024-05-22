@@ -45,6 +45,23 @@ body
     &::backdrop
         background-color: rgba(0, 0, 0, 0.2)
 
+@keyframes fade-up
+    0%
+        opacity: 1
+        transform: translateY(-3rem)
+
+    50%
+        opacity: 1
+    100%
+        opacity: 0
+        transform: translateY(-8rem)
+
+.inventory-history
+    position: absolute
+    p
+        position: absolute
+        animation: fade-up 1000ms ease-out forwards
+
 .item
     border: 1px solid red
     padding: 1rem
