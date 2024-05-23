@@ -37,7 +37,7 @@ update msg model =
             let
                 newInventory : Inventory
                 newInventory =
-                    Inventory.addItem "Test" 1 model
+                    Inventory.addItem "\u{1FAB5}" 1 model
             in
             ( newInventory
             , Ports.storeInventory (Codec.encodeInventory newInventory)
@@ -73,7 +73,7 @@ viewHistoryItem ( itemName, amount ) =
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        [ Html.div [ Html.Attributes.class "buttons" ] [ button [ onClick Increment ] [ text "Test" ] ]
+        [ Html.div [ Html.Attributes.class "buttons" ] [ button [ onClick Increment ] [ text "🌲" ] ]
         , Html.div [ Html.Attributes.class "player-stats" ]
             [ Html.button [ Html.Attributes.attribute "popovertarget" "player-inventory" ]
                 [ Html.text "Inventory"
