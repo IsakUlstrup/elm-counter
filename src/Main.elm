@@ -4,6 +4,7 @@ import Array exposing (Array)
 import Browser
 import Codec
 import Engine.Inventory as Inventory exposing (Inventory)
+import Engine.Tile exposing (Tile)
 import Html exposing (Html, main_)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -12,57 +13,6 @@ import Ports
 
 
 --TILE
-
-
-type alias Tile =
-    { icon : Maybe String
-    , history : Array ( String, Int )
-    }
-
-
-harvest : Int -> Array Tile -> ( Maybe String, Array Tile )
-harvest index tiles =
-    let
-        loot =
-            Array.get index tiles |> Maybe.andThen .icon
-    in
-    case loot of
-        Just _ ->
-            ( Just "\u{1FAB5}"
-            , arrayUpdate index (\t -> { t | icon = Nothing } |> addHistory ( "\u{1FAB5}", 1 )) tiles
-            )
-
-        Nothing ->
-            ( Nothing
-            , tiles
-            )
-
-
-addHistory : ( String, Int ) -> Tile -> Tile
-addHistory item tile =
-    { tile | history = tile.history |> Array.push item }
-
-
-arrayUpdate : Int -> (a -> a) -> Array a -> Array a
-arrayUpdate index f array =
-    let
-        item =
-            Array.get index array
-    in
-    case item of
-        Just i ->
-            Array.set index (f i) array
-
-        Nothing ->
-            array
-
-
-spawnResources : Array Tile -> Array Tile
-spawnResources tiles =
-    tiles
-
-
-
 -- MODEL
 
 
@@ -99,6 +49,9 @@ update msg model =
     case msg of
         ClickedTile index ->
             let
+                ( loot, newTiles ) =
+                    Engine.Tile.harvest index model.tiles
+
                 newInventory : Inventory
                 newInventory =
                     case loot of
@@ -107,9 +60,6 @@ update msg model =
 
                         Nothing ->
                             model.inventory
-
-                ( loot, newTiles ) =
-                    harvest index model.tiles
             in
             ( { model
                 | inventory = newInventory
@@ -119,7 +69,7 @@ update msg model =
             )
 
         Tick _ ->
-            ( { model | tiles = spawnResources model.tiles }, Cmd.none )
+            ( model, Cmd.none )
 
 
 
