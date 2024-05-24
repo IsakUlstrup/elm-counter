@@ -1,12 +1,28 @@
 module Main exposing (Model, Msg, main)
 
+import Array exposing (Array)
 import Browser
 import Codec
 import Engine.Inventory as Inventory exposing (Inventory)
-import Html exposing (Html, button, main_, text)
+import Html exposing (Html, main_, text)
 import Html.Attributes
 import Html.Events exposing (onClick)
 import Ports
+
+
+
+--TILE
+
+
+type alias Tile =
+    { icon : String
+    , history : Array ( String, Int )
+    }
+
+
+addHistory : ( String, Int ) -> Tile -> Tile
+addHistory item tile =
+    { tile | history = tile.history |> Array.push item }
 
 
 
@@ -14,12 +30,14 @@ import Ports
 
 
 type alias Model =
-    Inventory
+    { inventory : Inventory
+    , tiles : List Tile
+    }
 
 
 init : Maybe String -> ( Model, Cmd Msg )
 init flags =
-    ( Codec.decodeInventory flags, Cmd.none )
+    ( Model (Codec.decodeInventory flags) [ Tile "🌲" Array.empty ], Cmd.none )
 
 
 
@@ -27,19 +45,19 @@ init flags =
 
 
 type Msg
-    = Increment
+    = ClickedTile
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increment ->
+        ClickedTile ->
             let
                 newInventory : Inventory
                 newInventory =
-                    Inventory.addItem "\u{1FAB5}" 1 model
+                    Inventory.addItem "\u{1FAB5}" 1 model.inventory
             in
-            ( newInventory
+            ( { model | inventory = newInventory, tiles = List.map (addHistory ( "\u{1FAB5}", 1 )) model.tiles }
             , Ports.storeInventory (Codec.encodeInventory newInventory)
             )
 
@@ -70,16 +88,20 @@ viewHistoryItem ( itemName, amount ) =
     Html.p [] [ Html.text (String.fromInt amount ++ " " ++ itemName) ]
 
 
+viewTile : Tile -> Html Msg
+viewTile tile =
+    Html.button [ onClick ClickedTile ] [ text tile.icon, Html.div [ Html.Attributes.class "inventory-history" ] (tile.history |> Array.toList |> List.map viewHistoryItem) ]
+
+
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        [ Html.div [ Html.Attributes.class "buttons" ] [ button [ onClick Increment ] [ text "🌲" ] ]
+        [ Html.div [ Html.Attributes.class "tiles" ] (List.map viewTile model.tiles)
         , Html.div [ Html.Attributes.class "player-stats" ]
             [ Html.button [ Html.Attributes.attribute "popovertarget" "player-inventory" ]
                 [ Html.text "Inventory"
-                , Html.div [ Html.Attributes.class "inventory-history" ] (model |> Inventory.historyToList |> List.map viewHistoryItem)
                 ]
-            , viewInventory model
+            , viewInventory model.inventory
             ]
         ]
 

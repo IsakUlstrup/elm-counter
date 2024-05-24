@@ -9,6 +9,6 @@ const app = Elm.Main.init({
 });
 
 app.ports.storeInventory.subscribe(function (inventory) {
-    console.log("inv:", inventory)
+    // console.log("inv:", inventory)
     localStorage.setItem("inventory", inventory)
 });
