@@ -57,7 +57,10 @@ update msg model =
                 newInventory =
                     Inventory.addItem "\u{1FAB5}" 1 model.inventory
             in
-            ( { model | inventory = newInventory, tiles = List.map (addHistory ( "\u{1FAB5}", 1 )) model.tiles }
+            ( { model
+                | inventory = newInventory
+                , tiles = List.map (addHistory ( "\u{1FAB5}", 1 )) model.tiles
+              }
             , Ports.storeInventory (Codec.encodeInventory newInventory)
             )
 
@@ -80,7 +83,10 @@ viewInventory inventory =
         [ Html.Attributes.id "player-inventory"
         , Html.Attributes.attribute "popover" ""
         ]
-        (inventory |> Inventory.toList |> List.map viewItem)
+        (inventory
+            |> Inventory.toList
+            |> List.map viewItem
+        )
 
 
 viewHistoryItem : ( String, Int ) -> Html msg
@@ -90,7 +96,14 @@ viewHistoryItem ( itemName, amount ) =
 
 viewTile : Tile -> Html Msg
 viewTile tile =
-    Html.button [ onClick ClickedTile ] [ text tile.icon, Html.div [ Html.Attributes.class "inventory-history" ] (tile.history |> Array.toList |> List.map viewHistoryItem) ]
+    Html.button [ onClick ClickedTile ]
+        [ text tile.icon
+        , Html.div [ Html.Attributes.class "inventory-history" ]
+            (tile.history
+                |> Array.toList
+                |> List.map viewHistoryItem
+            )
+        ]
 
 
 view : Model -> Html Msg
