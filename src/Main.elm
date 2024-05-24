@@ -105,10 +105,13 @@ viewInventory inventory =
         [ Html.Attributes.id "player-inventory"
         , Html.Attributes.attribute "popover" ""
         ]
-        (inventory
-            |> Inventory.toList
-            |> List.map viewItem
-        )
+        [ Html.h3 [] [ Html.text "Inventory" ]
+        , Html.div [ Html.Attributes.class "items" ]
+            (inventory
+                |> Inventory.toList
+                |> List.map viewItem
+            )
+        ]
 
 
 viewHistoryItem : ( String, Int ) -> Html msg

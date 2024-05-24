@@ -3,6 +3,9 @@
     margin: 0
     box-sizing: border-box
 
+button
+    touch-action: manipulation
+
 body
     background: #262626
 
@@ -19,14 +22,15 @@ body
 .tiles
     flex: auto
     display: flex
+    flex-wrap: wrap
     justify-content: center
     align-items: center
     gap: 1rem
     padding: 1rem
+
     button
         padding: 1rem
-        font-size: 3rem
-        touch-action: manipulation
+        font-size: 2rem
 
 .player-stats
     padding: 1rem
@@ -37,16 +41,32 @@ body
     background-color: lightblue
 
 #player-inventory
-    padding: 2rem
+    padding: 1rem
     background: beige
     margin: auto
     border-radius: 0.5rem
     outline: none
     border: none
     box-shadow: 0rem 0rem 1rem rgba(0, 0, 0, 0.5)
+    width: 70%
+
+    &:popover-open
+        display: flex
+        flex-direction: column
+        align-items: center
+        gap: 1rem
 
     &::backdrop
-        background-color: rgba(0, 0, 0, 0.2)
+        background-color: rgba(0, 0, 0, 0.4)
+
+.items
+    display: flex
+    gap: 1rem
+
+.item
+    border: 1px solid lightblue
+    border-radius: 0.3rem
+    padding: 1rem
 
 @keyframes fade-up
     0%
@@ -66,7 +86,3 @@ body
         color: beige
         pointer-events: none
         font-size: 1.5rem
-
-.item
-    border: 1px solid red
-    padding: 1rem
