@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Browser
 import Codec
 import Engine.Inventory as Inventory exposing (Inventory)
-import Html exposing (Html, main_, text)
+import Html exposing (Html, main_)
 import Html.Attributes
 import Html.Events exposing (onClick)
 import Ports
@@ -15,9 +15,27 @@ import Ports
 
 
 type alias Tile =
-    { icon : String
+    { icon : Maybe String
     , history : Array ( String, Int )
     }
+
+
+harvest : Int -> Array Tile -> ( Maybe String, Array Tile )
+harvest index tiles =
+    let
+        loot =
+            Array.get index tiles |> Maybe.andThen .icon
+    in
+    case loot of
+        Just _ ->
+            ( Just "\u{1FAB5}"
+            , arrayUpdate index (\t -> { t | icon = Nothing } |> addHistory ( "\u{1FAB5}", 1 )) tiles
+            )
+
+        Nothing ->
+            ( Nothing
+            , tiles
+            )
 
 
 addHistory : ( String, Int ) -> Tile -> Tile
@@ -39,6 +57,11 @@ arrayUpdate index f array =
             array
 
 
+spawnResources : Array Tile -> Array Tile
+spawnResources tiles =
+    tiles
+
+
 
 -- MODEL
 
@@ -52,9 +75,9 @@ type alias Model =
 init : Maybe String -> ( Model, Cmd Msg )
 init flags =
     ( Model (Codec.decodeInventory flags)
-        ([ Tile "🌲" Array.empty
-         , Tile "🌳" Array.empty
-         , Tile "🌴" Array.empty
+        ([ Tile (Just "🌲") Array.empty
+         , Tile (Just "🌳") Array.empty
+         , Tile (Just "🌴") Array.empty
          ]
             |> Array.fromList
         )
@@ -68,6 +91,7 @@ init flags =
 
 type Msg
     = ClickedTile Int
+    | Tick Float
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -77,14 +101,25 @@ update msg model =
             let
                 newInventory : Inventory
                 newInventory =
-                    Inventory.addItem "\u{1FAB5}" 1 model.inventory
+                    case loot of
+                        Just item ->
+                            Inventory.addItem item 1 model.inventory
+
+                        Nothing ->
+                            model.inventory
+
+                ( loot, newTiles ) =
+                    harvest index model.tiles
             in
             ( { model
                 | inventory = newInventory
-                , tiles = arrayUpdate index (addHistory ( "\u{1FAB5}", 1 )) model.tiles
+                , tiles = newTiles
               }
             , Ports.storeInventory (Codec.encodeInventory newInventory)
             )
+
+        Tick _ ->
+            ( { model | tiles = spawnResources model.tiles }, Cmd.none )
 
 
 
@@ -122,7 +157,7 @@ viewHistoryItem ( itemName, amount ) =
 viewTile : ( Int, Tile ) -> Html Msg
 viewTile ( index, tile ) =
     Html.button [ onClick (ClickedTile index) ]
-        [ text tile.icon
+        [ Html.text (Maybe.withDefault " " tile.icon)
         , Html.div [ Html.Attributes.class "inventory-history" ]
             (tile.history
                 |> Array.toList
@@ -154,6 +189,7 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
+    -- Browser.Events.onAnimationFrameDelta Tick
     Sub.none
 
 
