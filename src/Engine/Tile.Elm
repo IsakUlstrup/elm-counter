@@ -1,10 +1,29 @@
-module Engine.Tile exposing (Tile, harvest)
+module Engine.Tile exposing (Tile, TileContent(..), contentToString, harvest)
 
 import Array exposing (Array)
 
 
+type TileContent
+    = Evergreen
+    | Palm
+    | Empty
+
+
+contentToString : Tile -> String
+contentToString tile =
+    case tile.content of
+        Evergreen ->
+            "evergreen"
+
+        Palm ->
+            "palm"
+
+        Empty ->
+            "empty"
+
+
 type alias Tile =
-    { icon : Maybe String
+    { content : TileContent
     , history : Array ( String, Int )
     }
 
@@ -13,15 +32,20 @@ harvest : Int -> Array Tile -> ( Maybe String, Array Tile )
 harvest index tiles =
     let
         loot =
-            Array.get index tiles |> Maybe.andThen .icon
+            Array.get index tiles |> Maybe.map .content
     in
     case loot of
-        Just _ ->
+        Just Evergreen ->
             ( Just "\u{1FAB5}"
-            , arrayUpdate index (\t -> { t | icon = Nothing } |> addHistory ( "\u{1FAB5}", 1 )) tiles
+            , arrayUpdate index (\t -> { t | content = Empty } |> addHistory ( "\u{1FAB5}", 1 )) tiles
             )
 
-        Nothing ->
+        Just Palm ->
+            ( Just "🍃"
+            , arrayUpdate index (\t -> { t | content = Empty } |> addHistory ( "🍃", 1 )) tiles
+            )
+
+        _ ->
             ( Nothing
             , tiles
             )
@@ -44,8 +68,3 @@ arrayUpdate index f array =
 
         Nothing ->
             array
-
-
-spawnResources : Array Tile -> Array Tile
-spawnResources tiles =
-    tiles

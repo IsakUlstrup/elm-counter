@@ -25,9 +25,9 @@ type alias Model =
 init : Maybe String -> ( Model, Cmd Msg )
 init flags =
     ( Model (Codec.decodeInventory flags)
-        ([ Tile (Just "🌲") Array.empty
-         , Tile (Just "🌳") Array.empty
-         , Tile (Just "🌴") Array.empty
+        ([ Tile Engine.Tile.Evergreen Array.empty
+         , Tile Engine.Tile.Palm Array.empty
+         , Tile Engine.Tile.Evergreen Array.empty
          ]
             |> Array.fromList
         )
@@ -107,7 +107,7 @@ viewHistoryItem ( itemName, amount ) =
 viewTile : ( Int, Tile ) -> Html Msg
 viewTile ( index, tile ) =
     Html.button [ onClick (ClickedTile index) ]
-        [ Html.text (Maybe.withDefault " " tile.icon)
+        [ Html.text (Engine.Tile.contentToString tile)
         , Html.div [ Html.Attributes.class "inventory-history" ]
             (tile.history
                 |> Array.toList
