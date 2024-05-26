@@ -17,6 +17,10 @@ type Island
     = Island (Array Tile)
 
 
+
+-- TODO: Ditch 3x3 requirement and opaque type
+
+
 empty : Island
 empty =
     List.range 1 9
