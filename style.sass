@@ -29,7 +29,6 @@ body
 .island
     display: grid
     gap: $spacing-small
-    aspect-ratio: 1/1
     grid-template-columns: repeat(3, 1fr)
 
     background: #8dd3a5
@@ -50,70 +49,3 @@ body
     &:active
         transform: scale(0.9)
         background: #c7efd5
-
-// .tiles
-//     flex: auto
-//     // width: 100%
-//     display: grid
-//     grid-template-columns: repeat(3, minmax(min(10rem, 100%), 1fr))
-//     // grid-template-rows: repeat(3, 1fr)
-//     gap: 0.5rem
-//     padding: 0.5rem
-
-//     button
-//         aspect-ratio: 1/1
-
-// .player-stats
-//     padding: 1rem
-//     flex: 0 0 5rem
-//     width: 100%
-//     display: flex
-//     justify-content: center
-//     background-color: lightblue
-
-// #player-inventory
-//     padding: 1rem
-//     background: beige
-//     margin: auto
-//     border-radius: 0.5rem
-//     outline: none
-//     border: none
-//     box-shadow: 0rem 0rem 1rem rgba(0, 0, 0, 0.5)
-//     width: 70%
-
-//     &:popover-open
-//         display: flex
-//         flex-direction: column
-//         align-items: center
-//         gap: 1rem
-
-//     &::backdrop
-//         background-color: rgba(0, 0, 0, 0.4)
-
-// .items
-//     display: flex
-//     gap: 1rem
-
-// .item
-//     border: 1px solid lightblue
-//     border-radius: 0.3rem
-//     padding: 1rem
-
-// @keyframes fade-up
-//     0%
-//         opacity: 1
-//         transform: translateY(-3rem)
-
-//     50%
-//         opacity: 1
-//     100%
-//         opacity: 0
-//         transform: translateY(-8rem)
-
-// .inventory-history
-//     p
-//         position: absolute
-//         animation: fade-up 1000ms ease-out forwards
-//         color: beige
-//         pointer-events: none
-//         font-size: 1.5rem
