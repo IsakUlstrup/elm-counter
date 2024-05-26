@@ -2,7 +2,9 @@ module Engine.Island exposing
     ( Island
     , Tile
     , empty
+    , fromList
     , toIndexedList
+    , toList
     , updateTile
     )
 
@@ -29,9 +31,23 @@ empty =
         |> Island
 
 
+fromList : List Tile -> Maybe Island
+fromList tiles =
+    if List.length tiles == 9 then
+        Just <| Island <| Array.fromList tiles
+
+    else
+        Nothing
+
+
 toIndexedList : Island -> List ( Int, Tile )
 toIndexedList (Island island) =
     Array.toIndexedList island
+
+
+toList : Island -> List Tile
+toList (Island island) =
+    Array.toList island
 
 
 {-| Update tile at given index

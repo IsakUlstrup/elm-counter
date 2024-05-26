@@ -7,6 +7,7 @@ import Engine.Island as Island exposing (Island, Tile)
 import Html exposing (Html, main_)
 import Html.Attributes
 import Html.Events
+import Ports
 
 
 
@@ -44,17 +45,30 @@ type alias Model =
     }
 
 
-init : Maybe String -> ( Model, Cmd Msg )
+type alias Flags =
+    { inventory : Maybe String
+    , islands : Maybe String
+    }
+
+
+init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( Model (Codec.decodeInventory flags)
-        [ Island.empty
-        , Island.empty
-        , Island.empty
-        , Island.empty
-        , Island.empty
-        , Island.empty
-        , Island.empty
-        ]
+    let
+        _ =
+            Debug.log "flags" flags
+
+        initInventory =
+            Codec.decodeInventory flags.inventory
+
+        initIslands =
+            flags.islands
+                |> Maybe.map Codec.decodeIslands
+                |> Maybe.withDefault
+                    [ Island.empty
+                    , Island.empty
+                    ]
+    in
+    ( Model initInventory initIslands
     , Cmd.none
     )
 
@@ -71,12 +85,13 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ClickedTile position ->
-            ( { model
-                | islands =
+            let
+                newIslands =
                     model.islands
                         |> updateTile position (\t -> t + 1)
-              }
-            , Cmd.none
+            in
+            ( { model | islands = newIslands }
+            , Ports.storeIslands (Codec.encodeIslands newIslands)
             )
 
 
@@ -152,7 +167,7 @@ subscriptions _ =
 -- MAIN
 
 
-main : Program (Maybe String) Model Msg
+main : Program Flags Model Msg
 main =
     Browser.element
         { init = init
