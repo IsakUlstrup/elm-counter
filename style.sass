@@ -17,14 +17,12 @@ body
     background: #93d8e1
 
 #app
-    max-width: 50rem
-    margin: 0 auto
-    padding: $spacing-medium
+    font-family: Helvetica, Arial, sans-serif
+    color: beige
+    padding: 5%
     display: grid
     gap: $spacing-medium
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr))
-    color: beige
-    font-family: Helvetica, Arial, sans-serif
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr))
 
 .island
     display: grid
@@ -42,10 +40,12 @@ body
     display: block
     background: #6ab985
     border: none
+    border-bottom: 1px solid #cbf6da
     color: beige
     aspect-ratio: 1/1
     font-size: 1.2rem
+    transition: all 200ms ease-out
 
     &:active
-        transform: scale(0.9)
+        transform: scale(0.97)
         background: #c7efd5
