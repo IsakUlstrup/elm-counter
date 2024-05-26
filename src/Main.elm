@@ -1,36 +1,60 @@
 module Main exposing (Model, Msg, main)
 
-import Array exposing (Array)
 import Browser
 import Codec
-import Engine.Inventory as Inventory exposing (Inventory)
-import Engine.Tile exposing (Tile)
+import Engine.Inventory exposing (Inventory)
+import Engine.Island as Island exposing (Island, Tile)
 import Html exposing (Html, main_)
 import Html.Attributes
-import Html.Events exposing (onClick)
-import Ports
+import Html.Events
 
 
 
---TILE
+{- Update island at index -}
+
+
+updateIsland : Int -> (Island -> Island) -> List Island -> List Island
+updateIsland targetIndex f islands =
+    let
+        helper index i =
+            if index == targetIndex then
+                f i
+
+            else
+                i
+    in
+    List.indexedMap helper islands
+
+
+{-| Update tile at index on island at index
+-}
+updateTile : ( Int, Int ) -> (Tile -> Tile) -> List Island -> List Island
+updateTile ( islandIndex, tileIndex ) f islands =
+    islands
+        |> updateIsland islandIndex (Island.updateTile tileIndex f)
+
+
+
 -- MODEL
 
 
 type alias Model =
     { inventory : Inventory
-    , tiles : Array Tile
+    , islands : List Island
     }
 
 
 init : Maybe String -> ( Model, Cmd Msg )
 init flags =
     ( Model (Codec.decodeInventory flags)
-        ([ Tile Engine.Tile.Evergreen Array.empty
-         , Tile Engine.Tile.Palm Array.empty
-         , Tile Engine.Tile.Evergreen Array.empty
-         ]
-            |> Array.fromList
-        )
+        [ Island.empty
+        , Island.empty
+        , Island.empty
+        , Island.empty
+        , Island.empty
+        , Island.empty
+        , Island.empty
+        ]
     , Cmd.none
     )
 
@@ -40,97 +64,79 @@ init flags =
 
 
 type Msg
-    = ClickedTile Int
-    | Tick Float
+    = ClickedTile ( Int, Int )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ClickedTile index ->
-            let
-                ( loot, newTiles ) =
-                    Engine.Tile.harvest index model.tiles
-
-                newInventory : Inventory
-                newInventory =
-                    case loot of
-                        Just item ->
-                            Inventory.addItem item 1 model.inventory
-
-                        Nothing ->
-                            model.inventory
-            in
+        ClickedTile position ->
             ( { model
-                | inventory = newInventory
-                , tiles = newTiles
+                | islands =
+                    model.islands
+                        |> updateTile position (\t -> t + 1)
               }
-            , Ports.storeInventory (Codec.encodeInventory newInventory)
+            , Cmd.none
             )
-
-        Tick _ ->
-            ( model, Cmd.none )
 
 
 
 -- VIEW
+-- viewItem : ( String, Int ) -> Html msg
+-- viewItem ( itemName, amount ) =
+--     Html.div [ Html.Attributes.class "item" ]
+--         [ Html.p [] [ Html.text itemName ]
+--         , Html.sup [] [ Html.text (String.fromInt amount) ]
+--         ]
+-- viewInventory : Inventory -> Html msg
+-- viewInventory inventory =
+--     Html.div
+--         [ Html.Attributes.id "player-inventory"
+--         , Html.Attributes.attribute "popover" ""
+--         ]
+--         [ Html.h3 [] [ Html.text "Inventory" ]
+--         , Html.div [ Html.Attributes.class "items" ]
+--             (inventory
+--                 |> Inventory.toList
+--                 |> List.map viewItem
+--             )
+--         ]
+-- viewHistoryItem : ( String, Int ) -> Html msg
+-- viewHistoryItem ( itemName, amount ) =
+--     Html.p [] [ Html.text (String.fromInt amount ++ " " ++ itemName) ]
+-- viewTile : ( Int, Tile ) -> Html Msg
+-- viewTile ( index, tile ) =
+--     Html.button [ onClick (ClickedTile index) ]
+--         [ Html.text (Engine.Tile.contentToString tile)
+--         , Html.div [ Html.Attributes.class "inventory-history" ]
+--             (tile.history
+--                 |> Array.toList
+--                 |> List.map viewHistoryItem
+--             )
+--         ]
 
 
-viewItem : ( String, Int ) -> Html msg
-viewItem ( itemName, amount ) =
-    Html.div [ Html.Attributes.class "item" ]
-        [ Html.p [] [ Html.text itemName ]
-        , Html.sup [] [ Html.text (String.fromInt amount) ]
+viewTile : Int -> ( Int, Tile ) -> Html Msg
+viewTile islandIndex ( index, tile ) =
+    Html.button
+        [ Html.Attributes.class "tile"
+        , Html.Events.onMouseDown (ClickedTile ( islandIndex, index ))
         ]
+        [ Html.text (String.fromInt tile) ]
 
 
-viewInventory : Inventory -> Html msg
-viewInventory inventory =
-    Html.div
-        [ Html.Attributes.id "player-inventory"
-        , Html.Attributes.attribute "popover" ""
-        ]
-        [ Html.h3 [] [ Html.text "Inventory" ]
-        , Html.div [ Html.Attributes.class "items" ]
-            (inventory
-                |> Inventory.toList
-                |> List.map viewItem
-            )
-        ]
-
-
-viewHistoryItem : ( String, Int ) -> Html msg
-viewHistoryItem ( itemName, amount ) =
-    Html.p [] [ Html.text (String.fromInt amount ++ " " ++ itemName) ]
-
-
-viewTile : ( Int, Tile ) -> Html Msg
-viewTile ( index, tile ) =
-    Html.button [ onClick (ClickedTile index) ]
-        [ Html.text (Engine.Tile.contentToString tile)
-        , Html.div [ Html.Attributes.class "inventory-history" ]
-            (tile.history
-                |> Array.toList
-                |> List.map viewHistoryItem
-            )
-        ]
+viewIsland : Int -> Island -> Html Msg
+viewIsland index island =
+    Html.div [ Html.Attributes.class "island" ]
+        (List.map (viewTile index) (Island.toIndexedList island))
 
 
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        [ Html.div [ Html.Attributes.class "tiles" ]
-            (model.tiles
-                |> Array.toIndexedList
-                |> List.map viewTile
-            )
-        , Html.div [ Html.Attributes.class "player-stats" ]
-            [ Html.button [ Html.Attributes.attribute "popovertarget" "player-inventory" ]
-                [ Html.text "Inventory"
-                ]
-            , viewInventory model.inventory
-            ]
-        ]
+        (model.islands
+            |> List.indexedMap viewIsland
+        )
 
 
 
@@ -139,7 +145,6 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    -- Browser.Events.onAnimationFrameDelta Tick
     Sub.none
 
 
