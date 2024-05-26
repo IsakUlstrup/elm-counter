@@ -64,9 +64,7 @@ init flags =
             flags.islands
                 |> Maybe.map Codec.decodeIslands
                 |> Maybe.withDefault
-                    [ Island.empty
-                    , Island.empty
-                    ]
+                    [ Island.empty ]
     in
     ( Model initInventory initIslands
     , Cmd.none
