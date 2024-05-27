@@ -157,7 +157,10 @@ viewTile islandIndex ( index, tile ) =
 
 viewIsland : Int -> Island -> Html Msg
 viewIsland index island =
-    Html.div [ Html.Attributes.class "island" ]
+    Html.div
+        [ Html.Attributes.class "island"
+        , Html.Attributes.style "animation-delay" (String.fromInt (index * 70) ++ "ms")
+        ]
         (List.map (viewTile index) (Island.toIndexedList island))
 
 
