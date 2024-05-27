@@ -54,9 +54,6 @@ type alias Flags =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
-        _ =
-            Debug.log "flags" flags
-
         initInventory =
             Codec.decodeInventory flags.inventory
 
