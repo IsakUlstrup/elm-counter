@@ -12,10 +12,8 @@ import Ports
 import Random exposing (Generator)
 
 
-
-{- Update island at index -}
-
-
+{-| Update island at index
+-}
 updateIsland : Int -> (Island -> Island) -> List Island -> List Island
 updateIsland targetIndex f islands =
     let
