@@ -92,38 +92,6 @@ update msg model =
 
 
 -- VIEW
--- viewItem : ( String, Int ) -> Html msg
--- viewItem ( itemName, amount ) =
---     Html.div [ Html.Attributes.class "item" ]
---         [ Html.p [] [ Html.text itemName ]
---         , Html.sup [] [ Html.text (String.fromInt amount) ]
---         ]
--- viewInventory : Inventory -> Html msg
--- viewInventory inventory =
---     Html.div
---         [ Html.Attributes.id "player-inventory"
---         , Html.Attributes.attribute "popover" ""
---         ]
---         [ Html.h3 [] [ Html.text "Inventory" ]
---         , Html.div [ Html.Attributes.class "items" ]
---             (inventory
---                 |> Inventory.toList
---                 |> List.map viewItem
---             )
---         ]
--- viewHistoryItem : ( String, Int ) -> Html msg
--- viewHistoryItem ( itemName, amount ) =
---     Html.p [] [ Html.text (String.fromInt amount ++ " " ++ itemName) ]
--- viewTile : ( Int, Tile ) -> Html Msg
--- viewTile ( index, tile ) =
---     Html.button [ onClick (ClickedTile index) ]
---         [ Html.text (Engine.Tile.contentToString tile)
---         , Html.div [ Html.Attributes.class "inventory-history" ]
---             (tile.history
---                 |> Array.toList
---                 |> List.map viewHistoryItem
---             )
---         ]
 
 
 viewTile : Int -> ( Int, Tile ) -> Html Msg
