@@ -55,7 +55,7 @@ islandsSpawnTiles islands =
                         ( newTile, newSeed ) =
                             Random.step (spawnTiles t) seed
                     in
-                    helper newSeed ts (newTile :: acum)
+                    helper newSeed ts (acum ++ [ newTile ])
     in
     Random.independentSeed
         |> Random.andThen
@@ -107,6 +107,7 @@ init flags =
 
 type Msg
     = ClickedTile ( Int, Int )
+    | ClickedAddIsland
     | Tick Float
 
 
@@ -118,6 +119,15 @@ update msg model =
                 newIslands =
                     model.islands
                         |> updateTile position (\_ -> 0)
+            in
+            ( { model | islands = newIslands }
+            , Ports.storeIslands (Codec.encodeIslands newIslands)
+            )
+
+        ClickedAddIsland ->
+            let
+                newIslands =
+                    model.islands ++ [ Island.empty ]
             in
             ( { model | islands = newIslands }
             , Ports.storeIslands (Codec.encodeIslands newIslands)
@@ -151,11 +161,22 @@ viewIsland index island =
         (List.map (viewTile index) (Island.toIndexedList island))
 
 
+viewAddIsland : Html Msg
+viewAddIsland =
+    Html.button
+        [ Html.Attributes.class "add-island"
+        , Html.Events.onMouseDown ClickedAddIsland
+        ]
+        [ Html.text "Add Island" ]
+
+
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        (model.islands
+        ((model.islands
             |> List.indexedMap viewIsland
+         )
+            ++ [ viewAddIsland ]
         )
 
 
