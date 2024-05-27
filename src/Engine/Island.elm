@@ -72,7 +72,7 @@ randomUpdate (Island island) =
         tileGenerator : Tile -> Generator Tile
         tileGenerator tile =
             if tile == 0 then
-                Random.weighted ( 50000, 0 ) [ ( 10, 1 ), ( 5, 10 ) ]
+                Random.weighted ( 50000, 0 ) [ ( 10, 1 ), ( 5, 10 ), ( 0.1, 100 ) ]
 
             else
                 Random.constant tile
