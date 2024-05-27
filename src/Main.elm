@@ -1,6 +1,7 @@
 module Main exposing (Model, Msg, main)
 
 import Browser
+import Browser.Events
 import Codec
 import Engine.Inventory exposing (Inventory)
 import Engine.Island as Island exposing (Island, Tile)
@@ -8,6 +9,7 @@ import Html exposing (Html, main_)
 import Html.Attributes
 import Html.Events
 import Ports
+import Random exposing (Generator)
 
 
 
@@ -35,6 +37,33 @@ updateTile ( islandIndex, tileIndex ) f islands =
         |> updateIsland islandIndex (Island.updateTile tileIndex f)
 
 
+spawnTiles : Island -> Generator Island
+spawnTiles island =
+    Island.randomUpdate island
+
+
+islandsSpawnTiles : List Island -> Generator (List Island)
+islandsSpawnTiles islands =
+    let
+        helper seed tiles acum =
+            case tiles of
+                [] ->
+                    acum
+
+                t :: ts ->
+                    let
+                        ( newTile, newSeed ) =
+                            Random.step (spawnTiles t) seed
+                    in
+                    helper newSeed ts (newTile :: acum)
+    in
+    Random.independentSeed
+        |> Random.andThen
+            (\s ->
+                Random.constant (helper s islands [])
+            )
+
+
 
 -- MODEL
 
@@ -42,6 +71,7 @@ updateTile ( islandIndex, tileIndex ) f islands =
 type alias Model =
     { inventory : Inventory
     , islands : List Island
+    , seed : Random.Seed
     }
 
 
@@ -63,7 +93,10 @@ init flags =
                 |> Maybe.withDefault
                     [ Island.empty ]
     in
-    ( Model initInventory initIslands
+    ( Model
+        initInventory
+        initIslands
+        (Random.initialSeed 42)
     , Cmd.none
     )
 
@@ -74,6 +107,7 @@ init flags =
 
 type Msg
     = ClickedTile ( Int, Int )
+    | Tick Float
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -89,6 +123,13 @@ update msg model =
             , Ports.storeIslands (Codec.encodeIslands newIslands)
             )
 
+        Tick _ ->
+            let
+                ( newIslands, newSeed ) =
+                    Random.step (islandsSpawnTiles model.islands) model.seed
+            in
+            ( { model | islands = newIslands, seed = newSeed }, Cmd.none )
+
 
 
 -- VIEW
@@ -98,6 +139,7 @@ viewTile : Int -> ( Int, Tile ) -> Html Msg
 viewTile islandIndex ( index, tile ) =
     Html.button
         [ Html.Attributes.class "tile"
+        , Html.Attributes.classList [ ( "zero", tile == 0 ) ]
         , Html.Events.onMouseDown (ClickedTile ( islandIndex, index ))
         ]
         [ Html.text (String.fromInt tile) ]
@@ -123,7 +165,7 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Browser.Events.onAnimationFrameDelta Tick
 
 
 

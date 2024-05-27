@@ -3,12 +3,14 @@ module Engine.Island exposing
     , Tile
     , empty
     , fromList
+    , randomUpdate
     , toIndexedList
     , toList
     , updateTile
     )
 
 import Array exposing (Array)
+import Random exposing (Generator)
 
 
 type alias Tile =
@@ -62,3 +64,33 @@ updateTile index f (Island island) =
 
         Nothing ->
             Island island
+
+
+randomUpdate : Island -> Generator Island
+randomUpdate (Island island) =
+    let
+        tileGenerator : Tile -> Generator Tile
+        tileGenerator tile =
+            if tile == 0 then
+                Random.weighted ( 10000, 0 ) [ ( 10, 1 ), ( 5, 10 ) ]
+
+            else
+                Random.constant tile
+
+        helper seed tiles acum =
+            case tiles of
+                [] ->
+                    acum
+
+                t :: ts ->
+                    let
+                        ( newTile, newSeed ) =
+                            Random.step (tileGenerator t) seed
+                    in
+                    helper newSeed ts (acum ++ [ newTile ])
+    in
+    Random.independentSeed
+        |> Random.andThen
+            (\s ->
+                Random.constant (helper s (Array.toList island) [] |> Array.fromList |> Island)
+            )
