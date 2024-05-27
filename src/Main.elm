@@ -117,7 +117,7 @@ update msg model =
             let
                 newIslands =
                     model.islands
-                        |> updateTile position (\t -> t + 1)
+                        |> updateTile position (\_ -> 0)
             in
             ( { model | islands = newIslands }
             , Ports.storeIslands (Codec.encodeIslands newIslands)
