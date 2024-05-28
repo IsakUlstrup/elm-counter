@@ -14,36 +14,15 @@ $spacing-large: 2rem
 
 // STYLES
 body
-    background: #93d8e1
+    background: #8dd3a5
 
 #app
     font-family: Helvetica, Arial, sans-serif
     color: beige
-    padding: 5%
-    display: grid
-    gap: $spacing-large
-    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr))
-
-@keyframes fade-fall
-    0%
-        transform: scale(0)
-        opacity: 0
-    100%
-        transform: scale(1)
-        opacity: 1
-
-.island
+    padding: $spacing-small
     display: grid
     gap: $spacing-small
-    grid-template-columns: repeat(3, 1fr)
-
-    background: #8dd3a5
-    padding: $spacing-small
-    border-radius: $spacing-medium
-    box-shadow: 0rem 0.5rem 0rem #b3a379, 0rem 0.5rem 1rem #557dbb
-    border-bottom: 1px solid #cbf6da
-    opacity: 0
-    animation: fade-fall 300ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards
+    grid-template-columns: repeat(3, minmax(5rem, 1fr))
 
 .tile
     border-radius: $spacing-medium
@@ -67,4 +46,4 @@ body
 .add-island
     place-self: center
     font-size: 1rem
-    padding: $spacing-large
+    padding: $spacing-medium

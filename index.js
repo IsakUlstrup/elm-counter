@@ -3,7 +3,7 @@ import { Elm } from "./src/Main.elm";
 
 const startingState = {
     inventory: localStorage.getItem("inventory"),
-    islands: localStorage.getItem("islands")
+    tiles: localStorage.getItem("tiles")
 };
 
 const app = Elm.Main.init({
@@ -11,11 +11,11 @@ const app = Elm.Main.init({
     flags: startingState
 });
 
-// app.ports.storeInventory.subscribe(function (inventory) {
-//     // console.log("inv:", inventory)
-//     localStorage.setItem("inventory", inventory)
-// });
-app.ports.storeIslands.subscribe(function (islands) {
-    console.log("islands:", islands)
-    localStorage.setItem("islands", islands)
+app.ports.storeInventory.subscribe(function (inventory) {
+    // console.log("inv:", inventory)
+    localStorage.setItem("inventory", inventory)
+});
+app.ports.storeTiles.subscribe(function (tiles) {
+    console.log("tiles:", tiles)
+    localStorage.setItem("tiles", tiles)
 });

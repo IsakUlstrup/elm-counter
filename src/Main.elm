@@ -1,10 +1,11 @@
-module Main exposing (Model, Msg, main)
+module Main exposing (Flags, Model, Msg, main)
 
+import Array exposing (Array)
 import Browser
 import Browser.Events
 import Codec
 import Engine.Inventory exposing (Inventory)
-import Engine.Island as Island exposing (Island, Tile)
+import Engine.Tile exposing (Tile)
 import Html exposing (Html, main_)
 import Html.Attributes
 import Html.Events
@@ -12,37 +13,29 @@ import Ports
 import Random exposing (Generator)
 
 
-{-| Update island at index
--}
-updateIsland : Int -> (Island -> Island) -> List Island -> List Island
-updateIsland targetIndex f islands =
+arrayUpdate : (a -> a) -> Int -> Array a -> Array a
+arrayUpdate f index tiles =
+    case Array.get index tiles of
+        Just tile ->
+            tiles
+                |> Array.set index (f tile)
+
+        Nothing ->
+            tiles
+
+
+generateTiles : Float -> Array Tile -> Generator (Array Tile)
+generateTiles dt tiles2 =
     let
-        helper index i =
-            if index == targetIndex then
-                f i
+        tileGenerator : Tile -> Generator Tile
+        tileGenerator tile =
+            if tile == 0 then
+                Random.weighted ( 9000000 / dt, 0 ) [ ( 10 * dt, 1 ), ( 5 * dt, 10 ), ( 0.1 * dt, 100 ) ]
 
             else
-                i
-    in
-    List.indexedMap helper islands
+                Random.constant tile
 
-
-{-| Update tile at index on island at index
--}
-updateTile : ( Int, Int ) -> (Tile -> Tile) -> List Island -> List Island
-updateTile ( islandIndex, tileIndex ) f islands =
-    islands
-        |> updateIsland islandIndex (Island.updateTile tileIndex f)
-
-
-spawnTiles : Island -> Generator Island
-spawnTiles island =
-    Island.randomUpdate island
-
-
-islandsSpawnTiles : List Island -> Generator (List Island)
-islandsSpawnTiles islands =
-    let
+        helper : Random.Seed -> List Tile -> List Tile -> List Tile
         helper seed tiles acum =
             case tiles of
                 [] ->
@@ -51,15 +44,13 @@ islandsSpawnTiles islands =
                 t :: ts ->
                     let
                         ( newTile, newSeed ) =
-                            Random.step (spawnTiles t) seed
+                            Random.step (tileGenerator t) seed
                     in
                     helper newSeed ts (acum ++ [ newTile ])
     in
     Random.independentSeed
-        |> Random.andThen
-            (\s ->
-                Random.constant (helper s islands [])
-            )
+        |> Random.map
+            (\s -> helper s (Array.toList tiles2) [] |> Array.fromList)
 
 
 
@@ -68,32 +59,33 @@ islandsSpawnTiles islands =
 
 type alias Model =
     { inventory : Inventory
-    , islands : List Island
+    , tiles : Array Tile
     , seed : Random.Seed
     }
 
 
 type alias Flags =
     { inventory : Maybe String
-    , islands : Maybe String
+    , tiles : Maybe String
     }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
+        initInventory : Inventory
         initInventory =
             Codec.decodeInventory flags.inventory
 
-        initIslands =
-            flags.islands
-                |> Maybe.map Codec.decodeIslands
-                |> Maybe.withDefault
-                    [ Island.empty ]
+        initTiles : Array Tile
+        initTiles =
+            flags.tiles
+                |> Maybe.map Codec.decodeTiles
+                |> Maybe.withDefault Array.empty
     in
     ( Model
         initInventory
-        initIslands
+        initTiles
         (Random.initialSeed 42)
     , Cmd.none
     )
@@ -104,7 +96,7 @@ init flags =
 
 
 type Msg
-    = ClickedTile ( Int, Int )
+    = ClickedTile Int
     | ClickedAddIsland
     | Tick Float
 
@@ -114,52 +106,53 @@ update msg model =
     case msg of
         ClickedTile position ->
             let
-                newIslands =
-                    model.islands
-                        |> updateTile position (\_ -> 0)
+                newTiles : Array Tile
+                newTiles =
+                    model.tiles
+                        |> arrayUpdate (\_ -> 0) position
             in
-            ( { model | islands = newIslands }
-            , Ports.storeIslands (Codec.encodeIslands newIslands)
+            ( { model | tiles = newTiles }
+            , Cmd.batch
+                [ Ports.storeTiles (Codec.encodeTiles newTiles)
+                , Ports.storeInventory (Codec.encodeInventory model.inventory)
+                ]
             )
 
         ClickedAddIsland ->
             let
-                newIslands =
-                    model.islands ++ [ Island.empty ]
+                newTiles : Array Tile
+                newTiles =
+                    Array.push 0 model.tiles
             in
-            ( { model | islands = newIslands }
-            , Ports.storeIslands (Codec.encodeIslands newIslands)
+            ( { model | tiles = newTiles }
+            , Ports.storeTiles (Codec.encodeTiles newTiles)
             )
 
-        Tick _ ->
+        Tick dt ->
             let
-                ( newIslands, newSeed ) =
-                    Random.step (islandsSpawnTiles model.islands) model.seed
+                ( newTiles, newSeed ) =
+                    Random.step (generateTiles dt model.tiles) model.seed
             in
-            ( { model | islands = newIslands, seed = newSeed }, Cmd.none )
+            ( { model
+                | tiles = newTiles
+                , seed = newSeed
+              }
+            , Cmd.none
+            )
 
 
 
 -- VIEW
 
 
-viewTile : Int -> ( Int, Tile ) -> Html Msg
-viewTile islandIndex ( index, tile ) =
+viewTile : ( Int, Tile ) -> Html Msg
+viewTile ( index, tile ) =
     Html.button
         [ Html.Attributes.class "tile"
         , Html.Attributes.classList [ ( "zero", tile == 0 ) ]
-        , Html.Events.onMouseDown (ClickedTile ( islandIndex, index ))
+        , Html.Events.onMouseDown (ClickedTile index)
         ]
         [ Html.text (String.fromInt tile) ]
-
-
-viewIsland : Int -> Island -> Html Msg
-viewIsland index island =
-    Html.div
-        [ Html.Attributes.class "island"
-        , Html.Attributes.style "animation-delay" (String.fromInt (index * 70) ++ "ms")
-        ]
-        (List.map (viewTile index) (Island.toIndexedList island))
 
 
 viewAddIsland : Html Msg
@@ -174,8 +167,9 @@ viewAddIsland =
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        ((model.islands
-            |> List.indexedMap viewIsland
+        ((model.tiles
+            |> Array.toIndexedList
+            |> List.map viewTile
          )
             ++ [ viewAddIsland ]
         )

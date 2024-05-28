@@ -1,7 +1,7 @@
-port module Ports exposing (storeInventory, storeIslands)
+port module Ports exposing (storeInventory, storeTiles)
 
 
 port storeInventory : String -> Cmd msg
 
 
-port storeIslands : String -> Cmd msg
+port storeTiles : String -> Cmd msg
