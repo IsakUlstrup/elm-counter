@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Browser
 import Browser.Events
 import Codec
-import Engine.Inventory exposing (Inventory)
+import Engine.Inventory as Inventory exposing (Inventory)
 import Engine.Tile exposing (Tile)
 import Html exposing (Html, main_)
 import Html.Attributes
@@ -106,15 +106,24 @@ update msg model =
     case msg of
         ClickedTile position ->
             let
+                newInventory : Inventory
+                newInventory =
+                    Array.get position model.tiles
+                        |> Maybe.withDefault 0
+                        |> (\i -> Inventory.addItem i model.inventory)
+
                 newTiles : Array Tile
                 newTiles =
                     model.tiles
                         |> arrayUpdate (\_ -> 0) position
             in
-            ( { model | tiles = newTiles }
+            ( { model
+                | tiles = newTiles
+                , inventory = newInventory
+              }
             , Cmd.batch
                 [ Ports.storeTiles (Codec.encodeTiles newTiles)
-                , Ports.storeInventory (Codec.encodeInventory model.inventory)
+                , Ports.storeInventory (Codec.encodeInventory newInventory)
                 ]
             )
 
