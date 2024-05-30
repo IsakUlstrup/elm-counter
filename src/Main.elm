@@ -164,20 +164,25 @@ viewCounter button =
 
         backgroundGradient : String
         backgroundGradient =
-            "linear-gradient(to top, blue,  cyan "
+            "linear-gradient(to top, orange, yellow "
                 ++ String.fromFloat filledPercentage
-                ++ "%, lightblue "
+                ++ "%, salmon "
                 ++ String.fromFloat filledPercentage
-                ++ "%, lightblue)"
+                ++ "%, salmon)"
     in
     Html.button
         [ Html.Events.on "pointerdown" (Decode.succeed CounterPress)
         , Html.Events.on "pointerup" (Decode.succeed CounterRelease)
         , Html.Attributes.class (toString button)
         , Html.Attributes.class "button"
-        , Html.Attributes.style "background" backgroundGradient
         ]
-        [ Html.text (String.fromInt button.count) ]
+        [ Html.div
+            [ Html.Attributes.class "meter"
+            , Html.Attributes.style "background" backgroundGradient
+            ]
+            [ Html.p [] [ Html.text "🥭" ] ]
+        , Html.p [] [ Html.text (String.fromInt button.count) ]
+        ]
 
 
 view : Model -> Html Msg

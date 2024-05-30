@@ -21,20 +21,34 @@ body
     user-select: none
     width: 10rem
     flex: 0 0 10rem
-    padding: 1rem
+    padding: 0.5rem
     margin: 1rem
-    border: 0.6rem solid beige
+    border: none
+    border-bottom: 1px solid #fffff4
     border-radius: 1rem
     font-size: 2rem
-    color: beige
+    color: #8e907e
     transition: all 200ms ease-out
     touch-action: manipulation
     webkit-tap-highlight-color: transparent
+    background: beige
+    box-shadow: 0rem 0.5rem 0rem #d2d2b9
+
+    display: flex
+    flex-direction: column
+    gap: 0.5rem
+
+    .meter
+        flex: auto
+        display: flex
+        justify-content: center
+        align-items: center
+        border-radius: 0.5rem
 
     // &.idle
     //     background: orange
     // &.pressed
     //     background: white
-    &.holding
-        // background: lightblue
-        box-shadow: 0rem 0rem 3rem beige
+    // &.holding
+    //     // background: lightblue
+    //     box-shadow: 0rem 0rem 3rem beige
