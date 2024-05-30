@@ -28,7 +28,7 @@ body
     border-radius: 1rem
     font-size: 2rem
     color: #8e907e
-    transition: all 200ms ease-out
+    transition: all 100ms ease-out
     touch-action: manipulation
     webkit-tap-highlight-color: transparent
     background: beige
@@ -48,10 +48,6 @@ body
         font-size: 5rem
         text-shadow: 0rem 0.3rem 0rem beige
 
-    // &.idle
-    //     background: orange
-    // &.pressed
-    //     background: white
-    // &.holding
-    //     // background: lightblue
-    //     box-shadow: 0rem 0rem 3rem beige
+    &.holding
+        box-shadow: 0rem 0.3rem 0rem #d2d2b9, 0rem 0rem 1rem beige
+        transform: translateY(0.2rem)
