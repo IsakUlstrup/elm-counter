@@ -18,6 +18,7 @@ body
     -webkit-user-select: none
 
 .button
+    -webkit-user-select: none
     user-select: none
     width: 10rem
     flex: 0 0 10rem
@@ -30,16 +31,19 @@ body
     color: #8e907e
     transition: all 100ms ease-out
     touch-action: manipulation
-    webkit-tap-highlight-color: transparent
+    -webkit-tap-highlight-color: rgba(0,0,0,0)
     background: beige
     box-shadow: 0rem 0.5rem 0rem #d2d2b9
 
     display: flex
     flex-direction: column
+
+    align-items: center
     gap: 0.5rem
 
     .meter
         flex: auto
+        width: 100%
         display: flex
         justify-content: center
         align-items: center
