@@ -1,12 +1,90 @@
 module Main exposing (Model, Msg, main)
 
 import Browser
-import Codec
-import Engine.Inventory as Inventory exposing (Inventory)
-import Html exposing (Html, button, main_, text)
+import Browser.Events
+import Html exposing (Html, button, main_)
 import Html.Attributes
-import Html.Events exposing (onClick)
-import Ports
+import Html.Events
+import Json.Decode as Decode
+
+
+
+-- BUTTON
+
+
+type ButtonState
+    = Idle
+    | Holding Float
+
+
+setIdle : Counter -> Counter
+setIdle button =
+    { button | state = Idle }
+
+
+setHolding : Counter -> Counter
+setHolding button =
+    { button | state = Holding 100 }
+
+
+type alias Counter =
+    { count : Int
+    , maxCount : Int
+    , state : ButtonState
+    }
+
+
+tick : Float -> Counter -> Counter
+tick dt button =
+    case button.state of
+        Idle ->
+            button
+
+        Holding time ->
+            if time == 0 then
+                { button | state = Holding 100 }
+
+            else
+                { button | state = Holding ((time - dt) |> max 0) }
+
+
+addCount : Counter -> Counter
+addCount button =
+    { button | count = button.count + 1 }
+
+
+subtractCount : Counter -> Counter
+subtractCount button =
+    { button | count = button.count - 1 |> max 0 }
+
+
+transferCount : Counter -> Counter -> ( Counter, Counter )
+transferCount from to =
+    if from.count > 0 then
+        ( subtractCount from, addCount to )
+
+    else
+        ( from, to )
+
+
+isDoneHolding : Counter -> Bool
+isDoneHolding button =
+    case button.state of
+        Holding time ->
+            time == 0
+
+        _ ->
+            False
+
+
+toString : Counter -> String
+toString button =
+    case button.state of
+        Idle ->
+            "idle"
+
+        Holding _ ->
+            "holding"
 
 
 
@@ -14,12 +92,16 @@ import Ports
 
 
 type alias Model =
-    Inventory
+    { inventory : Counter
+    , counter : Counter
+    }
 
 
 init : Maybe String -> ( Model, Cmd Msg )
-init flags =
-    ( Codec.decodeInventory flags, Cmd.none )
+init _ =
+    ( Model (Counter 0 100 Idle) (Counter 100 100 Idle)
+    , Cmd.none
+    )
 
 
 
@@ -27,19 +109,45 @@ init flags =
 
 
 type Msg
-    = Increment
+    = CounterPress
+    | CounterRelease
+    | Tick Float
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increment ->
+        CounterPress ->
             let
-                newInventory =
-                    Inventory.addItem "Test" 1 model
+                ( newCounter, newInventory ) =
+                    transferCount model.counter model.inventory
             in
-            ( newInventory
-            , Ports.storeInventory (Codec.encodeInventory newInventory)
+            ( { model
+                | counter = setHolding newCounter
+                , inventory = newInventory
+              }
+            , Cmd.none
+            )
+
+        CounterRelease ->
+            ( { model | counter = model.counter |> setIdle }
+            , Cmd.none
+            )
+
+        Tick dt ->
+            let
+                ( newCounter, newInventory ) =
+                    if isDoneHolding model.counter then
+                        transferCount model.counter model.inventory
+
+                    else
+                        ( model.counter, model.inventory )
+            in
+            ( { model
+                | counter = tick dt newCounter
+                , inventory = newInventory
+              }
+            , Cmd.none
             )
 
 
@@ -47,17 +155,38 @@ update msg model =
 -- VIEW
 
 
-viewItem : ( String, Int ) -> Html msg
-viewItem ( itemName, amount ) =
-    Html.div [ Html.Attributes.class "item" ] [ Html.p [] [ Html.text (itemName ++ " (" ++ String.fromInt amount ++ ")") ] ]
+viewCounter : Counter -> Html Msg
+viewCounter button =
+    let
+        filledPercentage : Float
+        filledPercentage =
+            toFloat button.count / toFloat button.maxCount * 100
+
+        backgroundGradient : String
+        backgroundGradient =
+            "linear-gradient(to top, blue,  cyan "
+                ++ String.fromFloat filledPercentage
+                ++ "%, lightblue "
+                ++ String.fromFloat filledPercentage
+                ++ "%, lightblue)"
+    in
+    Html.button
+        [ Html.Events.on "pointerdown" (Decode.succeed CounterPress)
+        , Html.Events.on "pointerup" (Decode.succeed CounterRelease)
+        , Html.Attributes.class (toString button)
+        , Html.Attributes.class "button"
+        , Html.Attributes.style "background" backgroundGradient
+        ]
+        [ Html.text (String.fromInt button.count) ]
 
 
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        [ Html.div [ Html.Attributes.class "buttons" ] [ button [ onClick Increment ] [ text "Test" ] ]
-        , Html.div [ Html.Attributes.class "inventory" ]
-            (model |> Inventory.toList |> List.map viewItem)
+        [ Html.h3 [] [ Html.text "Counter" ]
+        , viewCounter model.counter
+        , Html.h3 [] [ Html.text "Inventory" ]
+        , viewCounter model.inventory
         ]
 
 
@@ -67,7 +196,7 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Browser.Events.onAnimationFrameDelta Tick
 
 
 
