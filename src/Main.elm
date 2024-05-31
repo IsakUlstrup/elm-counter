@@ -157,31 +157,32 @@ update msg model =
 
 viewCounter : Counter -> Html Msg
 viewCounter button =
-    let
-        filledPercentage : Float
-        filledPercentage =
-            toFloat button.count / toFloat button.maxCount * 100
-
-        backgroundGradient : String
-        backgroundGradient =
-            "linear-gradient(to top, orange, yellow "
-                ++ String.fromFloat filledPercentage
-                ++ "%, salmon "
-                ++ String.fromFloat filledPercentage
-                ++ "%, salmon)"
-    in
     Html.button
         [ Html.Events.on "pointerdown" (Decode.succeed CounterPress)
         , Html.Events.on "pointerup" (Decode.succeed CounterRelease)
         , Html.Attributes.class (toString button)
         , Html.Attributes.class "button"
         ]
-        [ Html.div
-            [ Html.Attributes.class "meter"
-            , Html.Attributes.style "background" backgroundGradient
-            ]
-            [ Html.p [] [ Html.text "🥭" ] ]
+        [ viewIconMeter "🥭" button.maxCount button.count
         , Html.p [] [ Html.text (String.fromInt button.count) ]
+        ]
+
+
+viewIconMeter : String -> Int -> Int -> Html msg
+viewIconMeter icon max value =
+    let
+        filledPercentage : Float
+        filledPercentage =
+            toFloat value / toFloat max * 100
+    in
+    Html.div
+        [ Html.Attributes.class "custom-meter" ]
+        [ Html.div
+            [ Html.Attributes.class "bar"
+            , Html.Attributes.style "height" (String.fromFloat filledPercentage ++ "%")
+            ]
+            []
+        , Html.h1 [ Html.Attributes.class "icon" ] [ Html.text icon ]
         ]
 
 
