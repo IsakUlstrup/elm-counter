@@ -62,9 +62,13 @@ body
         background: linear-gradient(yellow, orange)
         border-radius: 0.5rem
 
-    .icon
+    .icon, .icon-outline
         position: absolute
         left: 50%
         top: 50%
         transform: translate(-50%, -50%)
         font-size: 4rem
+
+    .icon-outline
+        transform: translate(-50%, -50%) scale(1.2)
+        filter: brightness(9999%) sepia(80%)
