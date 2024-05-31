@@ -182,8 +182,11 @@ viewIconMeter icon max value =
             , Html.Attributes.style "height" (String.fromFloat filledPercentage ++ "%")
             ]
             []
-        , Html.h1 [ Html.Attributes.class "icon-outline" ] [ Html.text icon ]
-        , Html.h1 [ Html.Attributes.class "icon" ] [ Html.text icon ]
+        , Html.h1
+            [ Html.Attributes.class "icon"
+            , Html.Attributes.attribute "icon-outline" icon
+            ]
+            [ Html.text icon ]
         ]
 
 
