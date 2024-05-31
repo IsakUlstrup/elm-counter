@@ -174,9 +174,19 @@ viewIconMeter icon max value =
         filledPercentage : Float
         filledPercentage =
             toFloat value / toFloat max * 100
+
+        isEmpty : Bool
+        isEmpty =
+            value == 0
+
+        isFull : Bool
+        isFull =
+            value == max
     in
     Html.div
-        [ Html.Attributes.class "custom-meter" ]
+        [ Html.Attributes.class "custom-meter"
+        , Html.Attributes.classList [ ( "empty", isEmpty ), ( "full", isFull ) ]
+        ]
         [ Html.div
             [ Html.Attributes.class "bar"
             , Html.Attributes.style "height" (String.fromFloat filledPercentage ++ "%")

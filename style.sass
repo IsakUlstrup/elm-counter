@@ -64,12 +64,16 @@ $button-color: #faf9e3
         background: linear-gradient(yellow, orange)
         border-radius: 0.5rem
 
+    &.empty .icon
+        opacity: 0
+
     .icon
         position: absolute
         left: 50%
         top: 50%
         transform: translate(-50%, -50%)
         font-size: 4rem
+        transition: all 200ms ease-out
 
         &::before
             position: absolute
