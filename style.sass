@@ -44,7 +44,7 @@ $button-color: #faf9e3
     gap: 0.5rem
 
     &.holding
-        box-shadow: 0rem 0.3rem 0rem darken(desaturate($button-color, 50%), 30%), 0rem 0rem 1rem $button-color
+        box-shadow: 0rem 0.3rem 0rem darken(desaturate($button-color, 50%), 30%)
         transform: translateY(0.2rem)
 
 // CUSTOM METER
@@ -75,13 +75,13 @@ $button-color: #faf9e3
         font-size: 4rem
         transition: all 200ms ease-out
 
-        &::before
-            position: absolute
-            left: 50%
-            top: 50%
-            transform: translate(-50%, -50%)
-            font-size: 4rem
-            content: attr(icon-outline)
-            transform: translate(-50%, -50%) scale(1.2)
-            filter: grayscale(100%) brightness(2000%)
-            z-index: -1
+    .icon::before
+        position: absolute
+        left: 50%
+        top: 50%
+        transform: translate(-50%, -50%)
+        font-size: 4rem
+        content: attr(icon-outline)
+        transform: translate(-50%, -50%) scale(1.2)
+        filter: grayscale(100%) brightness(2000%)
+        z-index: -1
