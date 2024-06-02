@@ -6,6 +6,8 @@ import Html exposing (Html, button, main_)
 import Html.Attributes
 import Html.Events
 import Json.Decode as Decode
+import Svg exposing (Svg)
+import Svg.Attributes
 
 
 
@@ -192,11 +194,51 @@ viewIconMeter icon max value =
             , Html.Attributes.style "height" (String.fromFloat filledPercentage ++ "%")
             ]
             []
-        , Html.h1
-            [ Html.Attributes.class "icon"
-            , Html.Attributes.attribute "icon-outline" icon
+        , viewStrokeIcon icon
+        ]
+
+
+viewStrokeIcon : String -> Svg msg
+viewStrokeIcon icon =
+    Svg.svg
+        [ Svg.Attributes.viewBox "-50 -50 100 100"
+        , Svg.Attributes.class "icon"
+        ]
+        [ Svg.defs []
+            [ Svg.filter [ Svg.Attributes.id "outline" ]
+                [ Svg.feMorphology
+                    [ Svg.Attributes.in_ "SourceAlpha"
+                    , Svg.Attributes.operator "dilate"
+                    , Svg.Attributes.result "DILATED"
+                    , Svg.Attributes.radius "3"
+                    ]
+                    []
+                , Svg.feFlood
+                    [ Svg.Attributes.floodColor "beige"
+                    , Svg.Attributes.floodOpacity "1"
+                    , Svg.Attributes.result "PINK"
+                    ]
+                    []
+                , Svg.feComposite
+                    [ Svg.Attributes.in_ "PINK"
+                    , Svg.Attributes.in2 "DILATED"
+                    , Svg.Attributes.operator "in"
+                    , Svg.Attributes.result "OUTLINE"
+                    ]
+                    []
+                , Svg.feMerge []
+                    [ Svg.feMergeNode [ Svg.Attributes.in_ "OUTLINE" ] []
+                    , Svg.feMergeNode [ Svg.Attributes.in_ "SourceGraphic" ] []
+                    ]
+                ]
             ]
-            [ Html.text icon ]
+        , Svg.text_
+            [ Svg.Attributes.filter "url('#outline')"
+            , Svg.Attributes.textAnchor "middle"
+            , Svg.Attributes.dominantBaseline "central"
+            , Svg.Attributes.fontSize "3rem"
+            ]
+            [ Svg.text icon ]
         ]
 
 
