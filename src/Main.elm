@@ -2,91 +2,13 @@ module Main exposing (Model, Msg, main)
 
 import Browser
 import Browser.Events
+import Engine.Counter as Counter exposing (Counter)
 import Html exposing (Html, button, main_)
 import Html.Attributes
 import Html.Events
 import Json.Decode as Decode
 import Svg exposing (Svg)
 import Svg.Attributes
-
-
-
--- BUTTON
-
-
-type ButtonState
-    = Idle
-    | Holding Float
-
-
-setIdle : Counter -> Counter
-setIdle button =
-    { button | state = Idle }
-
-
-setHolding : Counter -> Counter
-setHolding button =
-    { button | state = Holding 100 }
-
-
-type alias Counter =
-    { count : Int
-    , maxCount : Int
-    , state : ButtonState
-    }
-
-
-tick : Float -> Counter -> Counter
-tick dt button =
-    case button.state of
-        Idle ->
-            button
-
-        Holding time ->
-            if time == 0 then
-                { button | state = Holding 100 }
-
-            else
-                { button | state = Holding ((time - dt) |> max 0) }
-
-
-addCount : Counter -> Counter
-addCount button =
-    { button | count = button.count + 1 }
-
-
-subtractCount : Counter -> Counter
-subtractCount button =
-    { button | count = button.count - 1 |> max 0 }
-
-
-transferCount : Counter -> Counter -> ( Counter, Counter )
-transferCount from to =
-    if from.count > 0 then
-        ( subtractCount from, addCount to )
-
-    else
-        ( from, to )
-
-
-isDoneHolding : Counter -> Bool
-isDoneHolding button =
-    case button.state of
-        Holding time ->
-            time == 0
-
-        _ ->
-            False
-
-
-toString : Counter -> String
-toString button =
-    case button.state of
-        Idle ->
-            "idle"
-
-        Holding _ ->
-            "holding"
 
 
 
@@ -101,7 +23,7 @@ type alias Model =
 
 init : Maybe String -> ( Model, Cmd Msg )
 init _ =
-    ( Model (Counter 0 100 Idle) (Counter 100 100 Idle)
+    ( Model (Counter.new "🥭" 100) (Counter.new "🥭" 100 |> Counter.setCount 100)
     , Cmd.none
     )
 
@@ -122,31 +44,31 @@ update msg model =
         CounterPress ->
             let
                 ( newCounter, newInventory ) =
-                    transferCount model.counter model.inventory
+                    Counter.transferCount model.counter model.inventory
             in
             ( { model
-                | counter = setHolding newCounter
+                | counter = Counter.setHolding newCounter
                 , inventory = newInventory
               }
             , Cmd.none
             )
 
         CounterRelease ->
-            ( { model | counter = model.counter |> setIdle }
+            ( { model | counter = model.counter |> Counter.setIdle }
             , Cmd.none
             )
 
         Tick dt ->
             let
                 ( newCounter, newInventory ) =
-                    if isDoneHolding model.counter then
-                        transferCount model.counter model.inventory
+                    if Counter.isDoneHolding model.counter then
+                        Counter.transferCount model.counter model.inventory
 
                     else
                         ( model.counter, model.inventory )
             in
             ( { model
-                | counter = tick dt newCounter
+                | counter = Counter.tick dt newCounter
                 , inventory = newInventory
               }
             , Cmd.none
@@ -162,10 +84,10 @@ viewCounter button =
     Html.button
         [ Html.Events.on "pointerdown" (Decode.succeed CounterPress)
         , Html.Events.on "pointerup" (Decode.succeed CounterRelease)
-        , Html.Attributes.class (toString button)
+        , Html.Attributes.class (Counter.toString button)
         , Html.Attributes.class "button"
         ]
-        [ viewIconMeter "🥭" button.maxCount button.count
+        [ viewIconMeter button.icon button.maxCount button.count
         , Html.p [] [ Html.text (String.fromInt button.count) ]
         ]
 
