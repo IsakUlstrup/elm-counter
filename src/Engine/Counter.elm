@@ -1,4 +1,4 @@
-module Engine.Counter exposing (ButtonState, Counter, addCount, isDoneHolding, new, setCount, setHolding, setIdle, subtractCount, tick, toString, transferCount)
+module Engine.Counter exposing (ButtonState, Counter, addCount, isDoneHolding, new, setCount, setHolding, setIdle, subtractCount, tick, toString)
 
 
 type alias Counter =
@@ -56,15 +56,6 @@ addCount button =
 subtractCount : Counter -> Counter
 subtractCount button =
     { button | count = button.count - 1 |> max 0 }
-
-
-transferCount : Counter -> Counter -> ( Counter, Counter )
-transferCount from to =
-    if from.count > 0 then
-        ( subtractCount from, addCount to )
-
-    else
-        ( from, to )
 
 
 isDoneHolding : Counter -> Bool
