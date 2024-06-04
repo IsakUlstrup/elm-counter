@@ -29,7 +29,8 @@ init _ =
             (Counter.new "🥭" 100)
             [ Counter.new "🥭" 100 |> Counter.setCount 0
             , Counter.new "🥭" 100 |> Counter.setCount 0
-            , Counter.new "🥭" 100 |> Counter.setCount 0
+
+            -- , Counter.new "🥭" 100 |> Counter.setCount 0
             ]
         )
         (Zipper.new
@@ -246,9 +247,14 @@ viewStrokeIcon icon =
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        [ Html.div [ Html.Attributes.class "counters" ]
+        [ Html.div
+            [ Html.Attributes.class "counters"
+            ]
             (model.counters |> Zipper.toList |> List.indexedMap (viewCounter False))
-        , Html.div [ Html.Attributes.class "counters" ]
+        , Html.div
+            [ Html.Attributes.class "counters"
+            , Html.Attributes.class "inventory"
+            ]
             (model.inventory |> Zipper.toList |> List.indexedMap (viewCounter True))
         ]
 
