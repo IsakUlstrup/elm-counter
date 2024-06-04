@@ -9,6 +9,7 @@ body
 #app
     height: 100vh
     display: flex
+    gap: 2rem
     flex-direction: column
     justify-content: center
     align-items: center
@@ -47,8 +48,9 @@ $button-color: #faf9e3
     align-items: center
     gap: 0.5rem
 
-    &.selected
-        border: 0.2rem solid magenta
+    &.selected .custom-meter .icon
+        transform: scale(1.5)
+        text-shadow: 0rem 0rem 1.5rem beige
 
     &.holding
         box-shadow: 0rem 0.3rem 0rem darken(desaturate($button-color, 50%), 30%)

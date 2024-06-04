@@ -38,6 +38,7 @@ init _ =
 type Msg
     = CounterPress Int
     | CounterRelease
+    | InventoryCounterPress Int
     | Tick Float
 
 
@@ -52,7 +53,6 @@ update msg model =
         CounterPress index ->
             let
                 ( newCounters, newInventory ) =
-                    -- Counter.transferCount
                     transferCount
                         (model.counters |> Zipper.setCurrent index |> Zipper.mapCurrent Counter.setHolding)
                         model.inventory
@@ -64,8 +64,25 @@ update msg model =
             , Cmd.none
             )
 
+        InventoryCounterPress index ->
+            let
+                ( newInventory, newCounters ) =
+                    transferCount
+                        (model.inventory |> Zipper.setCurrent index |> Zipper.mapCurrent Counter.setHolding)
+                        model.counters
+            in
+            ( { model
+                | counters = newCounters
+                , inventory = newInventory
+              }
+            , Cmd.none
+            )
+
         CounterRelease ->
-            ( { model | counters = Zipper.mapCurrent Counter.setIdle model.counters }
+            ( { model
+                | counters = Zipper.mapCurrent Counter.setIdle model.counters
+                , inventory = Zipper.mapCurrent Counter.setIdle model.inventory
+              }
             , Cmd.none
             )
 
@@ -75,12 +92,16 @@ update msg model =
                     if Zipper.currentPred Counter.isDoneHolding model.counters then
                         transferCount model.counters model.inventory
 
+                    else if Zipper.currentPred Counter.isDoneHolding model.inventory then
+                        transferCount model.inventory model.counters
+                            |> (\( i, c ) -> ( c, i ))
+
                     else
                         ( model.counters, model.inventory )
             in
             ( { model
                 | counters = Zipper.mapCurrent (Counter.tick dt) newCounter
-                , inventory = newInventory
+                , inventory = Zipper.mapCurrent (Counter.tick dt) newInventory
               }
             , Cmd.none
             )
@@ -90,10 +111,18 @@ update msg model =
 -- VIEW
 
 
-viewCounter : Int -> ( Bool, Counter ) -> Html Msg
-viewCounter index ( selected, button ) =
+viewCounter : Bool -> Int -> ( Bool, Counter ) -> Html Msg
+viewCounter inventory index ( selected, button ) =
+    let
+        pressEvent =
+            if inventory then
+                InventoryCounterPress index
+
+            else
+                CounterPress index
+    in
     Html.button
-        [ Html.Events.on "pointerdown" (Decode.succeed (CounterPress index))
+        [ Html.Events.on "pointerdown" (Decode.succeed pressEvent)
         , Html.Events.on "pointerup" (Decode.succeed CounterRelease)
         , Html.Attributes.class (Counter.toString button)
         , Html.Attributes.class "button"
@@ -101,7 +130,7 @@ viewCounter index ( selected, button ) =
         ]
         [ viewIconMeter button.icon button.maxCount button.count
         , Html.p [] [ Html.text (String.fromInt button.count) ]
-        , Html.p [] [ Html.text ("#" ++ String.fromInt index) ]
+        , Html.small [] [ Html.text ("#" ++ String.fromInt index) ]
         ]
 
 
@@ -180,8 +209,8 @@ viewStrokeIcon icon =
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        [ Html.div [ Html.Attributes.class "counters" ] (model.counters |> Zipper.toList |> List.indexedMap viewCounter)
-        , Html.div [ Html.Attributes.class "counters" ] (model.inventory |> Zipper.toList |> List.indexedMap viewCounter)
+        [ Html.div [ Html.Attributes.class "counters" ] (model.counters |> Zipper.toList |> List.indexedMap (viewCounter False))
+        , Html.div [ Html.Attributes.class "counters" ] (model.inventory |> Zipper.toList |> List.indexedMap (viewCounter True))
         ]
 
 
