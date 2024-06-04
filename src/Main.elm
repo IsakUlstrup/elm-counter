@@ -3,7 +3,7 @@ module Main exposing (Model, Msg, main)
 import Browser
 import Browser.Events
 import Engine.Counter as Counter exposing (Counter)
-import Html exposing (Html, button, main_)
+import Html exposing (Html, main_)
 import Html.Attributes
 import Html.Events
 import Json.Decode as Decode
