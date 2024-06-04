@@ -1,4 +1,4 @@
-module Engine.Counter exposing (ButtonState, Counter, addCount, isDoneHolding, new, setCount, setHolding, setIdle, subtractCount, tick, toString)
+module Engine.Counter exposing (ButtonState, Counter, addCount, isDoneHolding, new, notEmpty, notFull, setCount, setHolding, setIdle, subtractCount, tick, toString)
 
 
 type alias Counter =
@@ -76,3 +76,13 @@ toString button =
 
         Holding _ ->
             "holding"
+
+
+notEmpty : Counter -> Bool
+notEmpty counter =
+    counter.count > 0
+
+
+notFull : Counter -> Bool
+notFull counter =
+    counter.count < counter.maxCount

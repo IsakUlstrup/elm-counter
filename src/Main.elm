@@ -53,9 +53,13 @@ type Msg
 
 transferCount : Zipper Counter -> Zipper Counter -> ( Zipper Counter, Zipper Counter )
 transferCount from to =
-    ( Zipper.mapCurrent Counter.subtractCount from
-    , Zipper.mapCurrent Counter.addCount to
-    )
+    if Zipper.currentPred Counter.notEmpty from && Zipper.currentPred Counter.notFull to then
+        ( Zipper.mapCurrent Counter.subtractCount from
+        , Zipper.mapCurrent Counter.addCount to
+        )
+
+    else
+        ( from, to )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -63,6 +67,7 @@ update msg model =
     case msg of
         CounterPress index ->
             let
+                -- TODO: Only transfer if index == current index
                 ( newCounters, newInventory ) =
                     transferCount
                         (model.counters
@@ -89,8 +94,8 @@ update msg model =
                         model.counters
             in
             ( { model
-                | counters = newCounters
-                , inventory = newInventory
+                | inventory = newInventory
+                , counters = newCounters
               }
             , Cmd.none
             )
