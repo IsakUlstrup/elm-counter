@@ -1,4 +1,4 @@
-module Engine.Zipper exposing (Zipper, length, new, setCurrent, toList)
+module Engine.Zipper exposing (Zipper, currentPred, length, mapCurrent, new, setCurrent, toList)
 
 
 type Zipper a
@@ -38,7 +38,7 @@ currentIndex (Zipper zipper) =
         0
 
     else
-        List.length zipper.prev + 1
+        List.length zipper.prev
 
 
 moveLeft : Int -> Zipper a -> Zipper a
@@ -93,23 +93,29 @@ moveRight steps zipper =
 
 setCurrent : Int -> Zipper a -> Zipper a
 setCurrent index (Zipper zipper) =
-    if index >= 0 && index < length (Zipper zipper) then
-        let
-            cIndex : Int
-            cIndex =
-                currentIndex (Zipper zipper)
-        in
+    let
+        cIndex : Int
+        cIndex =
+            currentIndex (Zipper zipper)
+    in
+    if index >= 0 && index < length (Zipper zipper) && index /= cIndex then
         if index < cIndex then
             -- move left
-            Zipper zipper |> moveLeft (index - cIndex)
+            Zipper zipper |> moveLeft (index - cIndex |> abs)
 
-        else if index > cIndex then
+        else
             -- move right
             Zipper zipper |> moveRight (index - cIndex)
 
-        else
-            -- do nothing
-            Zipper zipper
-
     else
         Zipper zipper
+
+
+mapCurrent : (a -> a) -> Zipper a -> Zipper a
+mapCurrent f (Zipper zipper) =
+    Zipper { zipper | current = f zipper.current }
+
+
+currentPred : (a -> Bool) -> Zipper a -> Bool
+currentPred pred (Zipper zipper) =
+    pred zipper.current

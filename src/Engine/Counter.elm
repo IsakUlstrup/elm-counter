@@ -1,4 +1,4 @@
-module Engine.Counter exposing (ButtonState, Counter, isDoneHolding, new, setCount, setHolding, setIdle, tick, toString, transferCount)
+module Engine.Counter exposing (ButtonState, Counter, addCount, isDoneHolding, new, setCount, setHolding, setIdle, subtractCount, tick, toString, transferCount)
 
 
 type alias Counter =

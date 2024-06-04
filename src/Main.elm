@@ -3,6 +3,7 @@ module Main exposing (Model, Msg, main)
 import Browser
 import Browser.Events
 import Engine.Counter as Counter exposing (Counter)
+import Engine.Zipper as Zipper exposing (Zipper)
 import Html exposing (Html, main_)
 import Html.Attributes
 import Html.Events
@@ -16,14 +17,16 @@ import Svg.Attributes
 
 
 type alias Model =
-    { inventory : Counter
-    , counter : Counter
+    { inventory : Zipper Counter
+    , counters : Zipper Counter
     }
 
 
 init : Maybe String -> ( Model, Cmd Msg )
 init _ =
-    ( Model (Counter.new "🥭" 100) (Counter.new "🥭" 100 |> Counter.setCount 100)
+    ( Model
+        (Zipper.new (Counter.new "🥭" 100) [ Counter.new "🥭" 100 |> Counter.setCount 0 ])
+        (Zipper.new (Counter.new "🥭" 100 |> Counter.setCount 100) [ Counter.new "🥭" 100 |> Counter.setCount 50 ])
     , Cmd.none
     )
 
@@ -33,42 +36,50 @@ init _ =
 
 
 type Msg
-    = CounterPress
+    = CounterPress Int
     | CounterRelease
     | Tick Float
+
+
+transferCount : Zipper Counter -> Zipper Counter -> ( Zipper Counter, Zipper Counter )
+transferCount from to =
+    ( Zipper.mapCurrent Counter.subtractCount from, Zipper.mapCurrent Counter.addCount to )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        CounterPress ->
+        CounterPress index ->
             let
-                ( newCounter, newInventory ) =
-                    Counter.transferCount model.counter model.inventory
+                ( newCounters, newInventory ) =
+                    -- Counter.transferCount
+                    transferCount
+                        (model.counters |> Zipper.setCurrent index |> Zipper.mapCurrent Counter.setHolding)
+                        model.inventory
             in
             ( { model
-                | counter = Counter.setHolding newCounter
+                | counters = newCounters
                 , inventory = newInventory
               }
             , Cmd.none
             )
 
         CounterRelease ->
-            ( { model | counter = model.counter |> Counter.setIdle }
+            ( { model | counters = Zipper.mapCurrent Counter.setIdle model.counters }
             , Cmd.none
             )
 
         Tick dt ->
             let
                 ( newCounter, newInventory ) =
-                    if Counter.isDoneHolding model.counter then
-                        Counter.transferCount model.counter model.inventory
+                    if Zipper.currentPred Counter.isDoneHolding model.counters then
+                        transferCount model.counters model.inventory
 
                     else
-                        ( model.counter, model.inventory )
+                        ( model.counters, model.inventory )
             in
             ( { model
-                | counter = Counter.tick dt newCounter
+                | counters = Zipper.mapCurrent (Counter.tick dt) newCounter
                 , inventory = newInventory
               }
             , Cmd.none
@@ -79,16 +90,18 @@ update msg model =
 -- VIEW
 
 
-viewCounter : Counter -> Html Msg
-viewCounter button =
+viewCounter : Int -> ( Bool, Counter ) -> Html Msg
+viewCounter index ( selected, button ) =
     Html.button
-        [ Html.Events.on "pointerdown" (Decode.succeed CounterPress)
+        [ Html.Events.on "pointerdown" (Decode.succeed (CounterPress index))
         , Html.Events.on "pointerup" (Decode.succeed CounterRelease)
         , Html.Attributes.class (Counter.toString button)
         , Html.Attributes.class "button"
+        , Html.Attributes.classList [ ( "selected", selected ) ]
         ]
         [ viewIconMeter button.icon button.maxCount button.count
         , Html.p [] [ Html.text (String.fromInt button.count) ]
+        , Html.p [] [ Html.text ("#" ++ String.fromInt index) ]
         ]
 
 
@@ -168,9 +181,9 @@ view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
         [ Html.h3 [] [ Html.text "Counter" ]
-        , viewCounter model.counter
+        , Html.div [] (model.counters |> Zipper.toList |> List.indexedMap viewCounter)
         , Html.h3 [] [ Html.text "Inventory" ]
-        , viewCounter model.inventory
+        , Html.div [] (model.inventory |> Zipper.toList |> List.indexedMap viewCounter)
         ]
 
 

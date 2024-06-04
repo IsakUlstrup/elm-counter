@@ -43,6 +43,20 @@ suite =
                         |> Zipper.setCurrent 2
                         |> Zipper.toList
                         |> Expect.equalLists [ ( False, 0 ), ( False, 1 ), ( True, 2 ) ]
+            , test "Set current by index, then set back" <|
+                \_ ->
+                    Zipper.new 0 [ 1, 2 ]
+                        |> Zipper.setCurrent 2
+                        |> Zipper.setCurrent 0
+                        |> Zipper.toList
+                        |> Expect.equalLists [ ( True, 0 ), ( False, 1 ), ( False, 2 ) ]
+            , test "Set current by index twice" <|
+                \_ ->
+                    Zipper.new 0 [ 1, 2 ]
+                        |> Zipper.setCurrent 1
+                        |> Zipper.setCurrent 1
+                        |> Zipper.toList
+                        |> Expect.equalLists [ ( False, 0 ), ( True, 1 ), ( False, 2 ) ]
             , test "Set current by out of bounds index" <|
                 \_ ->
                     Zipper.new 0 [ 1, 2 ]
