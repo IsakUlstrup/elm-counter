@@ -114,6 +114,7 @@ update msg model =
 viewCounter : Bool -> Int -> ( Bool, Counter ) -> Html Msg
 viewCounter inventory index ( selected, button ) =
     let
+        pressEvent : Msg
         pressEvent =
             if inventory then
                 InventoryCounterPress index
