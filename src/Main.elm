@@ -180,10 +180,8 @@ viewStrokeIcon icon =
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        [ Html.h3 [] [ Html.text "Counter" ]
-        , Html.div [] (model.counters |> Zipper.toList |> List.indexedMap viewCounter)
-        , Html.h3 [] [ Html.text "Inventory" ]
-        , Html.div [] (model.inventory |> Zipper.toList |> List.indexedMap viewCounter)
+        [ Html.div [ Html.Attributes.class "counters" ] (model.counters |> Zipper.toList |> List.indexedMap viewCounter)
+        , Html.div [ Html.Attributes.class "counters" ] (model.inventory |> Zipper.toList |> List.indexedMap viewCounter)
         ]
 
 
