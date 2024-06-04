@@ -25,8 +25,17 @@ type alias Model =
 init : Maybe String -> ( Model, Cmd Msg )
 init _ =
     ( Model
-        (Zipper.new (Counter.new "🥭" 100) [ Counter.new "🥭" 100 |> Counter.setCount 0 ])
-        (Zipper.new (Counter.new "🥭" 100 |> Counter.setCount 100) [ Counter.new "🥭" 100 |> Counter.setCount 50 ])
+        (Zipper.new
+            (Counter.new "🥭" 100)
+            [ Counter.new "🥭" 100 |> Counter.setCount 0
+            , Counter.new "🥭" 100 |> Counter.setCount 0
+            , Counter.new "🥭" 100 |> Counter.setCount 0
+            ]
+        )
+        (Zipper.new
+            (Counter.new "🥭" 100 |> Counter.setCount 100)
+            [ Counter.new "🥭" 100 |> Counter.setCount 50 ]
+        )
     , Cmd.none
     )
 
@@ -44,7 +53,9 @@ type Msg
 
 transferCount : Zipper Counter -> Zipper Counter -> ( Zipper Counter, Zipper Counter )
 transferCount from to =
-    ( Zipper.mapCurrent Counter.subtractCount from, Zipper.mapCurrent Counter.addCount to )
+    ( Zipper.mapCurrent Counter.subtractCount from
+    , Zipper.mapCurrent Counter.addCount to
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -54,7 +65,10 @@ update msg model =
             let
                 ( newCounters, newInventory ) =
                     transferCount
-                        (model.counters |> Zipper.setCurrent index |> Zipper.mapCurrent Counter.setHolding)
+                        (model.counters
+                            |> Zipper.setCurrent index
+                            |> Zipper.mapCurrent Counter.setHolding
+                        )
                         model.inventory
             in
             ( { model
@@ -68,7 +82,10 @@ update msg model =
             let
                 ( newInventory, newCounters ) =
                     transferCount
-                        (model.inventory |> Zipper.setCurrent index |> Zipper.mapCurrent Counter.setHolding)
+                        (model.inventory
+                            |> Zipper.setCurrent index
+                            |> Zipper.mapCurrent Counter.setHolding
+                        )
                         model.counters
             in
             ( { model
@@ -131,7 +148,6 @@ viewCounter inventory index ( selected, button ) =
         ]
         [ viewIconMeter button.icon button.maxCount button.count
         , Html.p [] [ Html.text (String.fromInt button.count) ]
-        , Html.small [] [ Html.text ("#" ++ String.fromInt index) ]
         ]
 
 
@@ -210,8 +226,10 @@ viewStrokeIcon icon =
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
-        [ Html.div [ Html.Attributes.class "counters" ] (model.counters |> Zipper.toList |> List.indexedMap (viewCounter False))
-        , Html.div [ Html.Attributes.class "counters" ] (model.inventory |> Zipper.toList |> List.indexedMap (viewCounter True))
+        [ Html.div [ Html.Attributes.class "counters" ]
+            (model.counters |> Zipper.toList |> List.indexedMap (viewCounter False))
+        , Html.div [ Html.Attributes.class "counters" ]
+            (model.inventory |> Zipper.toList |> List.indexedMap (viewCounter True))
         ]
 
 
