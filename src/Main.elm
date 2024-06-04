@@ -67,14 +67,21 @@ update msg model =
     case msg of
         CounterPress index ->
             let
-                -- TODO: Only transfer if index == current index
                 ( newCounters, newInventory ) =
-                    transferCount
-                        (model.counters
+                    if Zipper.currentIndex model.counters == index then
+                        transferCount
+                            (model.counters
+                                |> Zipper.setCurrent index
+                                |> Zipper.mapCurrent Counter.setHolding
+                            )
+                            model.inventory
+
+                    else
+                        ( model.counters
                             |> Zipper.setCurrent index
                             |> Zipper.mapCurrent Counter.setHolding
+                        , model.inventory
                         )
-                        model.inventory
             in
             ( { model
                 | counters = newCounters
@@ -86,12 +93,20 @@ update msg model =
         InventoryCounterPress index ->
             let
                 ( newInventory, newCounters ) =
-                    transferCount
-                        (model.inventory
+                    if Zipper.currentIndex model.inventory == index then
+                        transferCount
+                            (model.inventory
+                                |> Zipper.setCurrent index
+                                |> Zipper.mapCurrent Counter.setHolding
+                            )
+                            model.counters
+
+                    else
+                        ( model.inventory
                             |> Zipper.setCurrent index
                             |> Zipper.mapCurrent Counter.setHolding
+                        , model.counters
                         )
-                        model.counters
             in
             ( { model
                 | inventory = newInventory

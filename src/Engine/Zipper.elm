@@ -1,4 +1,4 @@
-module Engine.Zipper exposing (Zipper, currentPred, length, mapCurrent, new, setCurrent, toList)
+module Engine.Zipper exposing (Zipper, currentIndex, currentPred, length, mapCurrent, new, setCurrent, toList)
 
 
 type Zipper a
