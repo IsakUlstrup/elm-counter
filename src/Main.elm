@@ -201,7 +201,7 @@ view model =
         , Html.div
             [ Html.Attributes.class "inventory"
             ]
-            [ Html.p [] [ Html.text (String.fromInt model.inventory) ] ]
+            [ Html.p [] [ Html.text ("🥭 " ++ String.fromInt model.inventory) ] ]
         ]
 
 
