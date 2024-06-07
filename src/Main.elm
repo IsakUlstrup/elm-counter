@@ -12,12 +12,28 @@ import Svg exposing (Svg)
 import Svg.Attributes
 
 
+type alias Inventory =
+    { current : Int
+    , max : Int
+    }
+
+
+addInventory : Inventory -> Inventory
+addInventory inventory =
+    { inventory | current = inventory.current + 1 |> min inventory.max }
+
+
+notFull : Inventory -> Bool
+notFull inventory =
+    inventory.current < inventory.max
+
+
 
 -- MODEL
 
 
 type alias Model =
-    { inventory : Int
+    { inventory : Inventory
     , counters : Zipper Counter
     }
 
@@ -25,7 +41,7 @@ type alias Model =
 init : Maybe String -> ( Model, Cmd Msg )
 init _ =
     ( Model
-        0
+        (Inventory 0 100)
         (Zipper.new
             (Counter.new "🥭" 100 |> Counter.setCount 100)
             [ Counter.new "🥭" 100 |> Counter.setCount 50
@@ -46,15 +62,15 @@ type Msg
     | Tick Float
 
 
+transferToInventory : Zipper Counter -> Inventory -> ( Zipper Counter, Inventory )
+transferToInventory from to =
+    if Zipper.currentPred Counter.notEmpty from && notFull to then
+        ( Zipper.mapCurrent Counter.subtractCount from
+        , addInventory to
+        )
 
--- transferCount : Zipper Counter -> Zipper Counter -> ( Zipper Counter, Zipper Counter )
--- transferCount from to =
---     if Zipper.currentPred Counter.notEmpty from && Zipper.currentPred Counter.notFull to then
---         ( Zipper.mapCurrent Counter.subtractCount from
---         , Zipper.mapCurrent Counter.addCount to
---         )
---     else
---         ( from, to )
+    else
+        ( from, to )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -63,12 +79,12 @@ update msg model =
         CounterPress index ->
             let
                 ( newCounters, newInventory ) =
-                    ( model.counters
-                        |> Zipper.setCurrent index
-                        |> Zipper.mapCurrent Counter.subtractCount
-                        |> Zipper.mapCurrent Counter.setHolding
-                    , model.inventory + 1
-                    )
+                    transferToInventory
+                        (model.counters
+                            |> Zipper.setCurrent index
+                            |> Zipper.mapCurrent Counter.setHolding
+                        )
+                        model.inventory
             in
             ( { model
                 | counters = newCounters
@@ -88,8 +104,7 @@ update msg model =
             let
                 ( newCounter, newInventory ) =
                     if Zipper.currentPred Counter.isDoneHolding model.counters then
-                        ( Zipper.mapCurrent Counter.subtractCount model.counters, model.inventory + 1 )
-                        -- transferCount model.counters model.inventory
+                        transferToInventory model.counters model.inventory
 
                     else
                         ( model.counters, model.inventory )
@@ -201,7 +216,7 @@ view model =
         , Html.div
             [ Html.Attributes.class "inventory"
             ]
-            [ Html.p [] [ Html.text ("🥭 " ++ String.fromInt model.inventory) ] ]
+            [ Html.p [] [ Html.text ("🥭 " ++ String.fromInt model.inventory.current ++ "/" ++ String.fromInt model.inventory.max) ] ]
         ]
 
 
