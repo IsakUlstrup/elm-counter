@@ -44,6 +44,7 @@ init _ =
         (Inventory 0 100)
         ([ Counter.new "🥭" 100 |> Counter.setCount 50
          , Counter.new "🥭" 100 |> Counter.setCount 10
+         , Counter.new "🥭" 30 |> Counter.setCount 5
          ]
             |> Array.fromList
         )
