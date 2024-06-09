@@ -3,7 +3,7 @@ module Main exposing (Model, Msg, main)
 import Array exposing (Array)
 import Browser
 import Browser.Events
-import Engine.Counter as Counter exposing (Counter)
+import Engine.Counter as Counter exposing (Counter, notEmpty)
 import Html exposing (Html, main_)
 import Html.Attributes
 import Html.Events
@@ -23,9 +23,19 @@ addInventory inventory =
     { inventory | current = inventory.current + 1 |> min inventory.max }
 
 
+subtractInventory : Inventory -> Inventory
+subtractInventory inventory =
+    { inventory | current = inventory.current - 1 |> max 0 }
+
+
 notFull : Inventory -> Bool
 notFull inventory =
     inventory.current < inventory.max
+
+
+notEmpty : Inventory -> Bool
+notEmpty inventory =
+    inventory.current > 0
 
 
 
@@ -42,9 +52,9 @@ init : Maybe String -> ( Model, Cmd Msg )
 init _ =
     ( Model
         (Inventory 0 100)
-        ([ Counter.new "🥭" 100 |> Counter.setCount 50
-         , Counter.new "🥭" 100 |> Counter.setCount 10
-         , Counter.new "🥭" 30 |> Counter.setCount 5
+        ([ Counter.new "🥭" 100 True |> Counter.setCount 50
+         , Counter.new "🥭" 100 True |> Counter.setCount 10
+         , Counter.new "🥭" 30 False |> Counter.setCount 5
          ]
             |> Array.fromList
         )
@@ -64,8 +74,11 @@ type Msg
 
 inventoryTransfer : Counter -> Inventory -> Inventory
 inventoryTransfer from to =
-    if Counter.notEmpty from && Counter.isDoneHolding from && notFull to then
+    if Counter.notEmpty from && Counter.isDoneHolding from && from.extract && notFull to then
         addInventory to
+
+    else if Counter.notFull from && Counter.isDoneHolding from && not from.extract && notEmpty to then
+        subtractInventory to
 
     else
         to
@@ -73,8 +86,11 @@ inventoryTransfer from to =
 
 counterTransfer : Inventory -> Counter -> Counter
 counterTransfer to from =
-    if Counter.notEmpty from && Counter.isDoneHolding from && notFull to then
+    if Counter.notEmpty from && Counter.isDoneHolding from && from.extract && notFull to then
         Counter.subtractCount from
+
+    else if Counter.notFull from && Counter.isDoneHolding from && not from.extract && notEmpty to then
+        Counter.addCount from
 
     else
         from
@@ -125,6 +141,7 @@ viewCounter index button =
         , Html.Events.on "pointerup" (Decode.succeed CounterRelease)
         , Html.Attributes.class (Counter.toString button)
         , Html.Attributes.class "button"
+        , Html.Attributes.classList [ ( "extract", button.extract ), ( "deposit", not button.extract ) ]
         ]
         [ viewIconMeter button.icon button.maxCount button.count
         , Html.p [] [ Html.text (String.fromInt button.count) ]

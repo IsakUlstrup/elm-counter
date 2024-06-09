@@ -6,6 +6,7 @@ type alias Counter =
     , maxCount : Int
     , state : ButtonState
     , icon : String
+    , extract : Bool
     }
 
 
@@ -14,9 +15,9 @@ type ButtonState
     | Holding Float
 
 
-new : String -> Int -> Counter
-new icon maxCount =
-    Counter 0 maxCount Idle icon
+new : String -> Int -> Bool -> Counter
+new icon maxCount extract =
+    Counter 0 maxCount Idle icon extract
 
 
 setCount : Int -> Counter -> Counter
