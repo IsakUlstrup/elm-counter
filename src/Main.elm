@@ -1,9 +1,9 @@
 module Main exposing (Model, Msg, main)
 
+import Array exposing (Array)
 import Browser
 import Browser.Events
 import Engine.Counter as Counter exposing (Counter)
-import Engine.Zipper as Zipper exposing (Zipper)
 import Html exposing (Html, main_)
 import Html.Attributes
 import Html.Events
@@ -34,7 +34,7 @@ notFull inventory =
 
 type alias Model =
     { inventory : Inventory
-    , counters : Zipper Counter
+    , counters : Array Counter
     }
 
 
@@ -42,11 +42,10 @@ init : Maybe String -> ( Model, Cmd Msg )
 init _ =
     ( Model
         (Inventory 0 100)
-        (Zipper.new
-            (Counter.new "🥭" 100 |> Counter.setCount 100)
-            [ Counter.new "🥭" 100 |> Counter.setCount 50
-            , Counter.new "🥭" 100 |> Counter.setCount 10
-            ]
+        ([ Counter.new "🥭" 100 |> Counter.setCount 50
+         , Counter.new "🥭" 100 |> Counter.setCount 10
+         ]
+            |> Array.fromList
         )
     , Cmd.none
     )
@@ -62,56 +61,53 @@ type Msg
     | Tick Float
 
 
-transferToInventory : Zipper Counter -> Inventory -> ( Zipper Counter, Inventory )
-transferToInventory from to =
-    if Zipper.currentPred Counter.notEmpty from && notFull to then
-        ( Zipper.mapCurrent Counter.subtractCount from
-        , addInventory to
-        )
+inventoryTransfer : Counter -> Inventory -> Inventory
+inventoryTransfer from to =
+    if Counter.notEmpty from && Counter.isDoneHolding from && notFull to then
+        addInventory to
 
     else
-        ( from, to )
+        to
+
+
+counterTransfer : Inventory -> Counter -> Counter
+counterTransfer to from =
+    if Counter.notEmpty from && Counter.isDoneHolding from && notFull to then
+        Counter.subtractCount from
+
+    else
+        from
+
+
+setHolding : Int -> Int -> Counter -> Counter
+setHolding targetIndex index counter =
+    if targetIndex == index then
+        Counter.setHolding counter
+
+    else
+        counter
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         CounterPress index ->
-            let
-                ( newCounters, newInventory ) =
-                    transferToInventory
-                        (model.counters
-                            |> Zipper.setCurrent index
-                            |> Zipper.mapCurrent Counter.setHolding
-                        )
-                        model.inventory
-            in
-            ( { model
-                | counters = newCounters
-                , inventory = newInventory
-              }
+            ( { model | counters = Array.indexedMap (setHolding index) model.counters }
             , Cmd.none
             )
 
         CounterRelease ->
-            ( { model
-                | counters = Zipper.mapCurrent Counter.setIdle model.counters
-              }
+            ( { model | counters = Array.map Counter.setIdle model.counters }
             , Cmd.none
             )
 
         Tick dt ->
-            let
-                ( newCounter, newInventory ) =
-                    if Zipper.currentPred Counter.isDoneHolding model.counters then
-                        transferToInventory model.counters model.inventory
-
-                    else
-                        ( model.counters, model.inventory )
-            in
             ( { model
-                | counters = Zipper.mapCurrent (Counter.tick dt) newCounter
-                , inventory = newInventory
+                | counters =
+                    model.counters
+                        |> Array.map (counterTransfer model.inventory)
+                        |> Array.map (Counter.tick dt)
+                , inventory = Array.foldl inventoryTransfer model.inventory model.counters
               }
             , Cmd.none
             )
@@ -121,8 +117,8 @@ update msg model =
 -- VIEW
 
 
-viewCounter : Int -> ( Bool, Counter ) -> Html Msg
-viewCounter index ( selected, button ) =
+viewCounter : Int -> Counter -> Html Msg
+viewCounter index button =
     Html.button
         [ Html.Events.on "pointerdown" (Decode.succeed (CounterPress index))
         , Html.Events.on "pointerup" (Decode.succeed CounterRelease)
@@ -212,7 +208,7 @@ view model =
         [ Html.div
             [ Html.Attributes.class "counters"
             ]
-            (model.counters |> Zipper.toList |> List.indexedMap viewCounter)
+            (model.counters |> Array.toList |> List.indexedMap viewCounter)
         , Html.div
             [ Html.Attributes.class "inventory"
             ]

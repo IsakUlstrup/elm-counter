@@ -31,7 +31,7 @@ setIdle button =
 
 setHolding : Counter -> Counter
 setHolding button =
-    { button | state = Holding 100 }
+    { button | state = Holding 0 }
 
 
 tick : Float -> Counter -> Counter
