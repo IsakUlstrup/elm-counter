@@ -1,9 +1,9 @@
-module Main exposing (Model, Msg, main)
+module Main exposing (Inventory, Model, Msg, main)
 
 import Array exposing (Array)
 import Browser
 import Browser.Events
-import Engine.Counter as Counter exposing (Counter, notEmpty)
+import Engine.Counter as Counter exposing (Counter)
 import Html exposing (Html, main_)
 import Html.Attributes
 import Html.Events
@@ -144,7 +144,8 @@ viewCounter index button =
         , Html.Attributes.classList [ ( "extract", button.extract ), ( "deposit", not button.extract ) ]
         ]
         [ viewIconMeter button.icon button.maxCount button.count
-        , Html.p [] [ Html.text (String.fromInt button.count) ]
+
+        -- , Html.p [] [ Html.text (String.fromInt button.count) ]
         ]
 
 
