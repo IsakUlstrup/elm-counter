@@ -22,11 +22,12 @@ body
 .counters
     display: grid
     gap: 0.5rem
-    grid-template-columns: repeat(3, minmax(7rem, 1fr))
+    grid-template-columns: repeat(3, minmax(5rem, 1fr))
 
-$button-color: #faf9e3
+$button-color: #b06297
 
 .button
+    position: relative
     -webkit-user-select: none
     user-select: none
     padding: 0.5rem
@@ -39,29 +40,65 @@ $button-color: #faf9e3
     touch-action: manipulation
     -webkit-tap-highlight-color: rgba(0,0,0,0)
     background: $button-color
-    box-shadow: 0rem 0.4rem 0rem darken(desaturate($button-color, 50%), 30%)
+    box-shadow: 0rem 0.4rem 0rem desaturate($button-color, 20%)
 
     display: flex
     flex-direction: column
     align-items: center
     gap: 0.5rem
 
-    &.extract
-        border-radius: 1rem
-        .custom-meter
-            border-radius: 0.5rem
-    &.deposit
-        border-radius: 50%
-        .custom-meter
-            border-radius: 50%
-    &.selected
-        box-shadow: 0rem 0.4rem 0rem darken(desaturate($button-color, 50%), 30%)
+    border-radius: 1rem
+    // &.extract
+    //     .custom-meter
+    //         border-radius: 0.5rem
+    // &.deposit
+    //     border-radius: 50%
+    //     .custom-meter
+    //         border-radius: 50%
+    // &.selected
+    //     box-shadow: 0rem 0.4rem 0rem darken(desaturate($button-color, 50%), 30%)
 
     &.holding
-        box-shadow: 0rem 0.2rem 0rem darken(desaturate($button-color, 50%), 30%)
+        box-shadow: 0rem 0.2rem 0rem desaturate($button-color, 20%)
         transform: translateY(0.2rem)
 
+        .custom-meter2
+            opacity: 1
+            transform: translateY(0rem) scale(1)
+
 // CUSTOM METER
+
+$tooltip-color: #f3f3de
+
+.custom-meter2
+    opacity: 0
+    transform: translateY(2rem) scale(0.5)
+    width: 100%
+    background-color: $tooltip-color
+    padding: 0.25rem
+    border-radius: 0.5rem
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)
+    filter: drop-shadow(0rem 0.15rem 0rem darken(desaturate($tooltip-color, 50%), 30%))
+
+    position: absolute
+    bottom: 115%
+    z-inde
+
+    &::after
+        content: " "
+        position: absolute
+        top: 100%
+        left: 50%
+        margin-left: -0.3rem
+        border-width: 0.3rem
+        border-style: solid
+        border-color: $tooltip-color transparent transparent transparent
+
+    .bar
+        height: 0.75rem
+        background: linear-gradient(#ffeb34, orange)
+        border-radius: 9999rem
+
 .custom-meter
     width: 100%
     height: 100%

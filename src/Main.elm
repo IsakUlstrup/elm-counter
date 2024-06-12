@@ -134,6 +134,33 @@ update msg model =
 -- VIEW
 
 
+viewCounterTooltip : Counter -> Html msg
+viewCounterTooltip counter =
+    let
+        filledPercentage : Float
+        filledPercentage =
+            toFloat counter.count / toFloat counter.maxCount * 100
+
+        isEmpty : Bool
+        isEmpty =
+            counter.count == 0
+
+        isFull : Bool
+        isFull =
+            counter.count == counter.maxCount
+    in
+    Html.div
+        [ Html.Attributes.class "custom-meter2"
+        , Html.Attributes.classList [ ( "empty", isEmpty ), ( "full", isFull ) ]
+        ]
+        [ Html.div
+            [ Html.Attributes.class "bar"
+            , Html.Attributes.style "width" (String.fromFloat filledPercentage ++ "%")
+            ]
+            []
+        ]
+
+
 viewCounter : Int -> Counter -> Html Msg
 viewCounter index button =
     Html.button
@@ -143,9 +170,9 @@ viewCounter index button =
         , Html.Attributes.class "button"
         , Html.Attributes.classList [ ( "extract", button.extract ), ( "deposit", not button.extract ) ]
         ]
-        [ viewIconMeter button.icon button.maxCount button.count
-
-        -- , Html.p [] [ Html.text (String.fromInt button.count) ]
+        [ -- viewIconMeter button.icon button.maxCount button.count
+          viewCounterTooltip button
+        , viewStrokeIcon button.icon
         ]
 
 
@@ -215,7 +242,7 @@ viewStrokeIcon icon =
             [ Svg.Attributes.filter "url('#outline')"
             , Svg.Attributes.textAnchor "middle"
             , Svg.Attributes.dominantBaseline "central"
-            , Svg.Attributes.fontSize "3rem"
+            , Svg.Attributes.fontSize "5rem"
             ]
             [ Svg.text icon ]
         ]
