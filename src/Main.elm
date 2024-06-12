@@ -265,10 +265,11 @@ view model =
             [ Html.Attributes.class "counters"
             ]
             (model.counters |> Array.toList |> List.indexedMap viewCounter)
-        , Html.div
-            [ Html.Attributes.class "inventory"
-            ]
-            [ Html.p [] [ Html.text ("🥭 " ++ String.fromInt model.inventory.current ++ "/" ++ String.fromInt model.inventory.max) ] ]
+
+        -- , Html.div
+        --     [ Html.Attributes.class "inventory"
+        --     ]
+        --     [ Html.p [] [ Html.text ("🥭 " ++ String.fromInt model.inventory.current ++ "/" ++ String.fromInt model.inventory.max) ] ]
         ]
 
 
