@@ -44,36 +44,8 @@ init : Maybe String -> ( Model, Cmd Msg )
 init _ =
     ( Model
         (Inventory 0 100)
-        ([ Counter.new "🥭" 100 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         , Counter.new "🥭" 80 |> Counter.setCount 0
-         , Counter.new "🥭" 30 |> Counter.setCount 0
-         ]
+        (List.range 0 50
+            |> List.map (always (Counter.new "🥭" 100))
             |> Array.fromList
         )
     , Cmd.none
