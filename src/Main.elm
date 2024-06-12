@@ -18,27 +18,19 @@ type alias Inventory =
     }
 
 
-addInventory : Inventory -> Inventory
-addInventory inventory =
-    { inventory | current = inventory.current + 1 |> min inventory.max }
 
-
-subtractInventory : Inventory -> Inventory
-subtractInventory inventory =
-    { inventory | current = inventory.current - 1 |> max 0 }
-
-
-notFull : Inventory -> Bool
-notFull inventory =
-    inventory.current < inventory.max
-
-
-notEmpty : Inventory -> Bool
-notEmpty inventory =
-    inventory.current > 0
-
-
-
+-- addInventory : Inventory -> Inventory
+-- addInventory inventory =
+--     { inventory | current = inventory.current + 1 |> min inventory.max }
+-- subtractInventory : Inventory -> Inventory
+-- subtractInventory inventory =
+--     { inventory | current = inventory.current - 1 |> max 0 }
+-- notFull : Inventory -> Bool
+-- notFull inventory =
+--     inventory.current < inventory.max
+-- notEmpty : Inventory -> Bool
+-- notEmpty inventory =
+--     inventory.current > 0
 -- MODEL
 
 
@@ -52,9 +44,35 @@ init : Maybe String -> ( Model, Cmd Msg )
 init _ =
     ( Model
         (Inventory 0 100)
-        ([ Counter.new "🥭" 100 True |> Counter.setCount 50
-         , Counter.new "🥭" 100 True |> Counter.setCount 10
-         , Counter.new "🥭" 30 False |> Counter.setCount 5
+        ([ Counter.new "🥭" 100 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
+         , Counter.new "🥭" 80 |> Counter.setCount 0
+         , Counter.new "🥭" 30 |> Counter.setCount 0
          ]
             |> Array.fromList
         )
@@ -72,28 +90,19 @@ type Msg
     | Tick Float
 
 
-inventoryTransfer : Counter -> Inventory -> Inventory
-inventoryTransfer from to =
-    if Counter.notEmpty from && Counter.isDoneHolding from && from.extract && notFull to then
-        addInventory to
 
-    else if Counter.notFull from && Counter.isDoneHolding from && not from.extract && notEmpty to then
-        subtractInventory to
-
-    else
-        to
-
-
-counterTransfer : Inventory -> Counter -> Counter
-counterTransfer to from =
-    if Counter.notEmpty from && Counter.isDoneHolding from && from.extract && notFull to then
-        Counter.subtractCount from
-
-    else if Counter.notFull from && Counter.isDoneHolding from && not from.extract && notEmpty to then
-        Counter.addCount from
-
-    else
-        from
+-- inventoryTransfer : Counter -> Inventory -> Inventory
+-- inventoryTransfer from to =
+--     if Counter.isDone from then
+--         addInventory to
+--     else
+--         to
+-- counterTransfer : Inventory -> Counter -> Counter
+-- counterTransfer _ from =
+--     if Counter.isDone from then
+--         Counter.subtractCount from
+--     else
+--         from
 
 
 setHolding : Int -> Int -> Counter -> Counter
@@ -122,9 +131,11 @@ update msg model =
             ( { model
                 | counters =
                     model.counters
-                        |> Array.map (counterTransfer model.inventory)
+                        -- |> Array.map (counterTransfer model.inventory)
                         |> Array.map (Counter.tick dt)
-                , inventory = Array.foldl inventoryTransfer model.inventory model.counters
+                        |> Array.map Counter.addCount
+
+                -- , inventory = Array.foldl inventoryTransfer model.inventory model.counters
               }
             , Cmd.none
             )
@@ -168,7 +179,7 @@ viewCounter index button =
         , Html.Events.on "pointerup" (Decode.succeed CounterRelease)
         , Html.Attributes.class (Counter.toString button)
         , Html.Attributes.class "button"
-        , Html.Attributes.classList [ ( "extract", button.extract ), ( "deposit", not button.extract ) ]
+        , Html.Attributes.classList [ ( "done", Counter.isDone button ) ]
         ]
         [ -- viewIconMeter button.icon button.maxCount button.count
           viewCounterTooltip button
@@ -176,32 +187,31 @@ viewCounter index button =
         ]
 
 
-viewIconMeter : String -> Int -> Int -> Html msg
-viewIconMeter icon max value =
-    let
-        filledPercentage : Float
-        filledPercentage =
-            toFloat value / toFloat max * 100
 
-        isEmpty : Bool
-        isEmpty =
-            value == 0
-
-        isFull : Bool
-        isFull =
-            value == max
-    in
-    Html.div
-        [ Html.Attributes.class "custom-meter"
-        , Html.Attributes.classList [ ( "empty", isEmpty ), ( "full", isFull ) ]
-        ]
-        [ Html.div
-            [ Html.Attributes.class "bar"
-            , Html.Attributes.style "height" (String.fromFloat filledPercentage ++ "%")
-            ]
-            []
-        , viewStrokeIcon icon
-        ]
+-- viewIconMeter : String -> Int -> Int -> Html msg
+-- viewIconMeter icon max value =
+--     let
+--         filledPercentage : Float
+--         filledPercentage =
+--             toFloat value / toFloat max * 100
+--         isEmpty : Bool
+--         isEmpty =
+--             value == 0
+--         isFull : Bool
+--         isFull =
+--             value == max
+--     in
+--     Html.div
+--         [ Html.Attributes.class "custom-meter"
+--         , Html.Attributes.classList [ ( "empty", isEmpty ), ( "full", isFull ) ]
+--         ]
+--         [ Html.div
+--             [ Html.Attributes.class "bar"
+--             , Html.Attributes.style "height" (String.fromFloat filledPercentage ++ "%")
+--             ]
+--             []
+--         , viewStrokeIcon icon
+--         ]
 
 
 viewStrokeIcon : String -> Svg msg
@@ -242,7 +252,7 @@ viewStrokeIcon icon =
             [ Svg.Attributes.filter "url('#outline')"
             , Svg.Attributes.textAnchor "middle"
             , Svg.Attributes.dominantBaseline "central"
-            , Svg.Attributes.fontSize "5rem"
+            , Svg.Attributes.fontSize "4rem"
             ]
             [ Svg.text icon ]
         ]

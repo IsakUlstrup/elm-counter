@@ -10,7 +10,7 @@ body
     height: 100vh
     display: flex
     flex-direction: column
-    justify-content: center
+    // justify-content: center
     align-items: center
     gap: 1rem
     padding: 1rem
@@ -21,7 +21,7 @@ body
 
 .counters
     display: grid
-    gap: 0.5rem
+    gap: 1rem
     grid-template-columns: repeat(3, minmax(5rem, 1fr))
 
 $button-color: #b06297
@@ -32,20 +32,20 @@ $button-color: #b06297
     user-select: none
     padding: 0.5rem
     margin-bottom: 0.4rem
-    border: none
-    border-bottom: 1px solid lighten($button-color, 30%)
+    // border: none
+    // border-bottom: 1px solid lighten($button-color, 30%)
     font-size: 1.5rem
     color: #8e907e
-    transition: all 100ms ease-out
+    transition: all 200ms ease-out
     touch-action: manipulation
     -webkit-tap-highlight-color: rgba(0,0,0,0)
     background: $button-color
-    box-shadow: 0rem 0.4rem 0rem desaturate($button-color, 20%)
+    box-shadow: 0rem 0.4rem 0rem darken(white, 20%)
+    border: 0.3rem solid white
 
     display: flex
-    flex-direction: column
     align-items: center
-    gap: 0.5rem
+    justify-content: center
 
     border-radius: 1rem
     // &.extract
@@ -59,30 +59,33 @@ $button-color: #b06297
     //     box-shadow: 0rem 0.4rem 0rem darken(desaturate($button-color, 50%), 30%)
 
     &.holding
-        box-shadow: 0rem 0.2rem 0rem desaturate($button-color, 20%)
+        box-shadow: 0rem 0.2rem 0rem darken(white, 20%)
         transform: translateY(0.2rem)
 
         .custom-meter2
             opacity: 1
             transform: translateY(0rem) scale(1)
 
+    // &.done
+    //     opacity: 0
+    //     transform: scale(0)
+
 // CUSTOM METER
 
-$tooltip-color: #f3f3de
+$tooltip-color: white
 
 .custom-meter2
     opacity: 0
     transform: translateY(2rem) scale(0.5)
-    width: 100%
+    width: 80%
     background-color: $tooltip-color
     padding: 0.25rem
     border-radius: 0.5rem
     transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)
-    filter: drop-shadow(0rem 0.15rem 0rem darken(desaturate($tooltip-color, 50%), 30%))
+    filter: drop-shadow(0rem 0.15rem 0rem darken(white, 20%))
 
     position: absolute
-    bottom: 115%
-    z-inde
+    bottom: 95%
 
     &::after
         content: " "
@@ -95,27 +98,29 @@ $tooltip-color: #f3f3de
         border-color: $tooltip-color transparent transparent transparent
 
     .bar
-        height: 0.75rem
+        height: 0.5rem
         background: linear-gradient(#ffeb34, orange)
-        border-radius: 9999rem
+        border-radius: 0.3rem
 
-.custom-meter
+.icon
     width: 100%
-    height: 100%
-    background: rgba(0, 0, 0, 0.2)
-    // border-radius: inherit
-    overflow: hidden
-    display: flex
-    flex-direction: column
-    justify-content: flex-end
-    position: relative
-    aspect-ratio: 1/1
+// .custom-meter
+//     width: 100%
+//     height: 100%
+//     background: rgba(0, 0, 0, 0.2)
+//     // border-radius: inherit
+//     overflow: hidden
+//     display: flex
+//     flex-direction: column
+//     justify-content: flex-end
+//     position: relative
+//     aspect-ratio: 1/1
 
-    .bar
-        background: linear-gradient(#ffeb34, orange)
-        border-radius: 0.2rem
+//     .bar
+//         background: linear-gradient(#ffeb34, orange)
+//         border-radius: 0.2rem
 
-    .icon
-        position: absolute
-        transition: all 200ms ease-out
-        filter: sepia(20%) saturate(90%)
+//     .icon
+//         position: absolute
+//         transition: all 200ms ease-out
+//         filter: sepia(20%) saturate(90%)
