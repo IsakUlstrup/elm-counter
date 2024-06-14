@@ -19,18 +19,6 @@ type alias Inventory =
 
 
 
--- addInventory : Inventory -> Inventory
--- addInventory inventory =
---     { inventory | current = inventory.current + 1 |> min inventory.max }
--- subtractInventory : Inventory -> Inventory
--- subtractInventory inventory =
---     { inventory | current = inventory.current - 1 |> max 0 }
--- notFull : Inventory -> Bool
--- notFull inventory =
---     inventory.current < inventory.max
--- notEmpty : Inventory -> Bool
--- notEmpty inventory =
---     inventory.current > 0
 -- MODEL
 
 
@@ -44,8 +32,8 @@ init : Maybe String -> ( Model, Cmd Msg )
 init _ =
     ( Model
         (Inventory 0 100)
-        (List.range 0 50
-            |> List.map (always (Counter.new "🥭" 100))
+        (List.range 0 20
+            |> List.map (always (Counter.new "🥭" 30))
             |> Array.fromList
         )
     , Cmd.none
