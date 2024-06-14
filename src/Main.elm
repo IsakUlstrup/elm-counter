@@ -120,10 +120,6 @@ update msg model =
 viewCounterTooltip : Counter -> Html msg
 viewCounterTooltip counter =
     let
-        filledPercentage : Float
-        filledPercentage =
-            toFloat counter.count / toFloat counter.maxCount * 100
-
         isEmpty : Bool
         isEmpty =
             counter.count == 0
@@ -136,9 +132,9 @@ viewCounterTooltip counter =
         [ Html.Attributes.class "custom-meter2"
         , Html.Attributes.classList [ ( "empty", isEmpty ), ( "full", isFull ) ]
         ]
-        [ Html.div
-            [ Html.Attributes.class "bar"
-            , Html.Attributes.style "width" (String.fromFloat filledPercentage ++ "%")
+        [ Html.progress
+            [ Html.Attributes.value (String.fromInt counter.count)
+            , Html.Attributes.max (String.fromInt counter.maxCount)
             ]
             []
         ]
