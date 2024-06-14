@@ -70,20 +70,31 @@ $tooltip-color: white
 
 .custom-meter2
     opacity: 0
-    transform: translateY(2rem) scale(0.5)
-    width: 110%
+    position: absolute
+    bottom: 100%
+    width: 100%
+    height: 1rem
     background-color: $tooltip-color
     padding: 0.25rem
     border-radius: 0.5rem
     transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1)
     filter: drop-shadow(0rem 0.15rem 0rem darken(white, 20%)) drop-shadow(0rem 0rem 0.75rem black)
+    transform: translateY(2rem) scale(0.5)
 
-    position: absolute
-    bottom: 100%
-
-    progress
+    progress[value]
+        display: block
+        -webkit-appearance: none
+        -moz-appearance: none
+        appearance: none
+        outline: none
+        border: none
         width: 100%
-        height: 1rem
+        height: 100%
+        border-radius: 0.3rem
+        background: rgba(0, 0, 0, 0.1)
+
+        &::-webkit-progress-bar, &::-moz-progress-bar
+            background: $button-color
 
     &::after
         content: " "
@@ -94,8 +105,3 @@ $tooltip-color: white
         border-width: 0.3rem
         border-style: solid
         border-color: $tooltip-color transparent transparent transparent
-
-    // .bar
-    //     height: 0.75rem
-    //     background: linear-gradient(#ffeb34, orange)
-    //     border-radius: 0.3rem
