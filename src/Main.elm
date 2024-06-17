@@ -211,7 +211,7 @@ viewBlob _ =
         , Svg.Attributes.class "blob-svg"
         ]
         [ Svg.defs []
-            [ gooFilter 10 ]
+            [ gooFilter 4 ]
         , Svg.g
             [ Svg.Attributes.filter "url(#goo)"
             , Svg.Attributes.class "blob"
@@ -220,21 +220,24 @@ viewBlob _ =
                 [ Svg.Attributes.cx "0"
                 , Svg.Attributes.cy "0"
                 , Svg.Attributes.r "30"
-                , Svg.Attributes.fill "cyan"
                 ]
                 []
             , Svg.circle
                 [ Svg.Attributes.cx "0"
                 , Svg.Attributes.cy "0"
                 , Svg.Attributes.r "30"
-                , Svg.Attributes.fill "magenta"
                 ]
                 []
             , Svg.circle
                 [ Svg.Attributes.cx "0"
                 , Svg.Attributes.cy "0"
                 , Svg.Attributes.r "30"
-                , Svg.Attributes.fill "yellow"
+                ]
+                []
+            , Svg.circle
+                [ Svg.Attributes.cx "0"
+                , Svg.Attributes.cy "0"
+                , Svg.Attributes.r "30"
                 ]
                 []
             ]
