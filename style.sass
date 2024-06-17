@@ -8,7 +8,7 @@ body
 
 #app
     height: 100vh
-    padding: 2rem
+    padding: 1rem
     color: beige
     font-family: Arial, Helvetica, sans-serif
     user-select: none
@@ -16,10 +16,10 @@ body
 
 .counters
     display: grid
-    gap: 2rem
-    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr))
+    gap: 1rem
+    grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr))
 
-$button-color: #f4d1e1
+$button-color: #e991b8
 
 .button
     position: relative
@@ -31,9 +31,8 @@ $button-color: #f4d1e1
     transition: all 200ms ease-out
     background: $button-color
     box-shadow: 0rem 0.4rem 0rem darken(white, 20%)
-    border: 1rem solid white
+    border: 0.5rem solid white
     border-radius: 1.2rem
-    overflow: hidden
 
     display: flex
     align-items: center
@@ -67,7 +66,7 @@ $tooltip-color: white
     position: absolute
     bottom: 100%
     width: 100%
-    height: 1rem
+    height: 1.5rem
     background-color: $tooltip-color
     padding: 0.25rem
     border-radius: 0.5rem
@@ -102,42 +101,3 @@ $tooltip-color: white
 
 svg
     width: 100%
-
-@keyframes sway-horizontal
-    0%
-        transform: translateX(0)
-    25%
-        transform: translateX(-50px)
-    75%
-        transform: translateX(50px)
-    0%
-        transform: translateX(0)
-@keyframes sway-vertical
-    0%
-        transform: translateY(0)
-    25%
-        transform: translateY(-50px)
-    75%
-        transform: translateY(50px)
-    0%
-        transform: translateY(0)
-@keyframes sway-diagonal
-    0%
-        transform: translate(0, 0)
-    25%
-        transform: translate(-50px, -50px)
-    75%
-        transform: translate(50px, 50px)
-    0%
-        transform: translate(0, 0)
-
-$sway-duration: 20000ms
-
-.blob
-    fill: white
-    circle:nth-child(1)
-        animation: sway-horizontal $sway-duration linear infinite
-    circle:nth-child(2)
-        animation: sway-vertical $sway-duration linear 1000ms infinite
-    circle:nth-child(3)
-        animation: sway-diagonal $sway-duration linear 2000ms infinite
