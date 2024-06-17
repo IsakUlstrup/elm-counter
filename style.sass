@@ -22,7 +22,7 @@ body
 .counters
     display: grid
     gap: 1rem
-    grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr))
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr))
 
 $button-color: #f4d1e1
 
@@ -30,21 +30,19 @@ $button-color: #f4d1e1
     position: relative
     -webkit-user-select: none
     user-select: none
-    // padding: 0.5rem
-    font-size: 1.5rem
-    color: #8e907e
-    transition: all 200ms ease-out
+    cursor: pointer
     touch-action: manipulation
     -webkit-tap-highlight-color: rgba(0,0,0,0)
+    transition: all 200ms ease-out
     background: $button-color
     box-shadow: 0rem 0.4rem 0rem darken(white, 20%)
-    border: 0.3rem solid white
+    border: 1rem solid white
+    border-radius: 1.2rem
+    overflow: hidden
 
     display: flex
     align-items: center
     justify-content: center
-
-    border-radius: 1rem
 
     &.holding
         box-shadow: 0rem 0.2rem 0rem darken(white, 20%)
@@ -107,31 +105,34 @@ $tooltip-color: white
         border-style: solid
         border-color: $tooltip-color transparent transparent transparent
 
+svg
+    width: 100%
+
 @keyframes sway-horizontal
     0%
         transform: translateX(0)
     25%
-        transform: translateX(-20px)
+        transform: translateX(-50px)
     75%
-        transform: translateX(20px)
+        transform: translateX(50px)
     0%
         transform: translateX(0)
 @keyframes sway-vertical
     0%
         transform: translateY(0)
     25%
-        transform: translateY(-20px)
+        transform: translateY(-50px)
     75%
-        transform: translateY(20px)
+        transform: translateY(50px)
     0%
         transform: translateY(0)
 @keyframes sway-diagonal
     0%
         transform: translate(0, 0)
     25%
-        transform: translate(-20px, -20px)
+        transform: translate(-50px, -50px)
     75%
-        transform: translate(20px, 20px)
+        transform: translate(50px, 50px)
     0%
         transform: translate(0, 0)
 

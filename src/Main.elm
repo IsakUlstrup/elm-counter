@@ -137,7 +137,7 @@ viewCounter index button =
         [ -- viewIconMeter button.icon button.maxCount button.count
           --   viewCounterTooltip button
           -- , viewStrokeIcon button.icon
-          viewBlob
+          viewBlob button
         ]
 
 
@@ -204,14 +204,14 @@ gooFilter magnitude =
         ]
 
 
-viewBlob : Svg msg
-viewBlob =
+viewBlob : Counter -> Svg msg
+viewBlob _ =
     Svg.svg
-        [ Svg.Attributes.viewBox "-50 -50 100 100"
+        [ Svg.Attributes.viewBox "-100 -100 200 200"
         , Svg.Attributes.class "blob-svg"
         ]
         [ Svg.defs []
-            [ gooFilter 5 ]
+            [ gooFilter 10 ]
         , Svg.g
             [ Svg.Attributes.filter "url(#goo)"
             , Svg.Attributes.class "blob"
@@ -219,21 +219,21 @@ viewBlob =
             [ Svg.circle
                 [ Svg.Attributes.cx "0"
                 , Svg.Attributes.cy "0"
-                , Svg.Attributes.r "20"
+                , Svg.Attributes.r "30"
                 , Svg.Attributes.fill "cyan"
                 ]
                 []
             , Svg.circle
                 [ Svg.Attributes.cx "0"
                 , Svg.Attributes.cy "0"
-                , Svg.Attributes.r "20"
+                , Svg.Attributes.r "30"
                 , Svg.Attributes.fill "magenta"
                 ]
                 []
             , Svg.circle
                 [ Svg.Attributes.cx "0"
                 , Svg.Attributes.cy "0"
-                , Svg.Attributes.r "20"
+                , Svg.Attributes.r "30"
                 , Svg.Attributes.fill "yellow"
                 ]
                 []
