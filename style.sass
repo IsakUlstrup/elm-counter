@@ -45,6 +45,9 @@ $button-color: #e991b8
         &:not(.done) .custom-meter2
             opacity: 1
             transform: translateY(0rem) scale(1)
+        &:not(.done) .radial-progress
+            // opacity: 1
+            transform: translate(-35px, -35px)
 
     &.done
         background: desaturate($button-color, 20%)
@@ -56,6 +59,12 @@ $button-color: #e991b8
 .icon
     transition: all 200ms
     width: 100%
+
+// RADIAL PROGRESS
+.radial-progress
+    transition: all 200ms ease-out
+    circle
+        transition: all 200ms ease-out
 
 // CUSTOM METER
 
