@@ -17,7 +17,7 @@ body
 .counters
     display: grid
     gap: 1rem
-    grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr))
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr))
 
 $button-color: #e991b8
 
@@ -31,7 +31,7 @@ $button-color: #e991b8
     transition: all 200ms ease-out
     background: $button-color
     box-shadow: 0rem 0.4rem 0rem darken(white, 20%)
-    border: 0.5rem solid white
+    border: 1rem solid white
     border-radius: 1.2rem
 
     display: flex
@@ -45,9 +45,6 @@ $button-color: #e991b8
         &:not(.done) .custom-meter2
             opacity: 1
             transform: translateY(0rem) scale(1)
-        &:not(.done) .radial-progress
-            // opacity: 1
-            transform: translate(-35px, -35px)
 
     &.done
         background: desaturate($button-color, 20%)
@@ -62,10 +59,10 @@ $button-color: #e991b8
 
 // RADIAL PROGRESS
 .radial-progress
-    transition: all 200ms ease-out
-    circle
-        transition: all 200ms ease-out
+    transition: all 2500ms cubic-bezier(0.34, 1.56, 0.64, 1)
 
+.goo
+    fill: #a1f5d6
 // CUSTOM METER
 
 $tooltip-color: white

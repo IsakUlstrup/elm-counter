@@ -32,8 +32,8 @@ init : Maybe String -> ( Model, Cmd Msg )
 init _ =
     ( Model
         (Inventory 0 100)
-        (List.range 1 9
-            |> List.map (always (Counter.new "🥭" 30))
+        (List.range 1 3
+            |> List.map (\_ -> Counter.new "🥥" 100)
             |> Array.fromList
         )
     , Cmd.none
@@ -88,26 +88,29 @@ update msg model =
 
 
 -- VIEW
--- viewCounterTooltip : Counter -> Html msg
--- viewCounterTooltip counter =
---     let
---         isEmpty : Bool
---         isEmpty =
---             counter.count == 0
---         isFull : Bool
---         isFull =
---             counter.count == counter.maxCount
---     in
---     Html.div
---         [ Html.Attributes.class "custom-meter2"
---         , Html.Attributes.classList [ ( "empty", isEmpty ), ( "full", isFull ) ]
---         ]
---         [ Html.progress
---             [ Html.Attributes.value (String.fromInt counter.count)
---             , Html.Attributes.max (String.fromInt counter.maxCount)
---             ]
---             []
---         ]
+
+
+viewCounterTooltip : Counter -> Html msg
+viewCounterTooltip counter =
+    let
+        isEmpty : Bool
+        isEmpty =
+            counter.count == 0
+
+        isFull : Bool
+        isFull =
+            counter.count == counter.maxCount
+    in
+    Html.div
+        [ Html.Attributes.class "custom-meter2"
+        , Html.Attributes.classList [ ( "empty", isEmpty ), ( "full", isFull ) ]
+        ]
+        [ Html.progress
+            [ Html.Attributes.value (String.fromInt counter.count)
+            , Html.Attributes.max (String.fromInt counter.maxCount)
+            ]
+            []
+        ]
 
 
 viewCounter : Int -> Counter -> Html Msg
@@ -119,27 +122,55 @@ viewCounter index button =
         , Html.Attributes.class "button"
         , Html.Attributes.classList [ ( "done", Counter.isDone button ) ]
         ]
-        [ -- viewCounterTooltip button
-          viewStrokeIcon button
+        [ viewCounterTooltip button
+        , viewStrokeIcon button
         ]
 
 
-viewRadialProgress : Int -> Int -> Svg msg
-viewRadialProgress maxValue value =
-    let
-        x =
-            toFloat value / toFloat maxValue
-    in
-    Svg.g [ Svg.Attributes.class "radial-progress" ]
-        [ Svg.circle
-            [ Svg.Attributes.r "10"
-            , Svg.Attributes.stroke "beige"
-            , Svg.Attributes.strokeWidth "5"
-            , Svg.Attributes.strokeLinecap "round"
-            , Svg.Attributes.strokeDasharray "100"
-            , Svg.Attributes.strokeDashoffset (String.fromFloat (100 - (100 * x)))
-            , Svg.Attributes.pathLength "100"
-            , Svg.Attributes.fill "transparent"
+strokeFilter : Svg msg
+strokeFilter =
+    Svg.filter [ Svg.Attributes.id "outline" ]
+        [ Svg.feMorphology
+            [ Svg.Attributes.in_ "SourceAlpha"
+            , Svg.Attributes.operator "dilate"
+            , Svg.Attributes.result "DILATED"
+            , Svg.Attributes.radius "3"
+            ]
+            []
+        , Svg.feFlood
+            [ Svg.Attributes.floodColor "beige"
+            , Svg.Attributes.floodOpacity "1"
+            , Svg.Attributes.result "PINK"
+            ]
+            []
+        , Svg.feComposite
+            [ Svg.Attributes.in_ "PINK"
+            , Svg.Attributes.in2 "DILATED"
+            , Svg.Attributes.operator "in"
+            , Svg.Attributes.result "OUTLINE"
+            ]
+            []
+        , Svg.feMerge []
+            [ Svg.feMergeNode [ Svg.Attributes.in_ "OUTLINE" ] []
+            , Svg.feMergeNode [ Svg.Attributes.in_ "SourceGraphic" ] []
+            ]
+        ]
+
+
+gooFilter : Svg msg
+gooFilter =
+    Svg.filter [ Svg.Attributes.id "goo-filter" ]
+        [ Svg.feGaussianBlur
+            [ Svg.Attributes.in_ "SourceGraphic"
+            , Svg.Attributes.stdDeviation "5"
+            , Svg.Attributes.result "blur"
+            ]
+            []
+        , Svg.feColorMatrix
+            [ Svg.Attributes.in_ "blur"
+            , Svg.Attributes.mode "matrix"
+            , Svg.Attributes.values "1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 10 -5"
+            , Svg.Attributes.result "goo"
             ]
             []
         ]
@@ -148,43 +179,18 @@ viewRadialProgress maxValue value =
 viewStrokeIcon : Counter -> Svg msg
 viewStrokeIcon counter =
     Svg.svg
-        [ Svg.Attributes.viewBox "-50 -50 100 100"
+        [ Svg.Attributes.viewBox "-100 -100 200 200"
         , Svg.Attributes.class "icon"
         ]
         [ Svg.defs []
-            [ Svg.filter [ Svg.Attributes.id "outline" ]
-                [ Svg.feMorphology
-                    [ Svg.Attributes.in_ "SourceAlpha"
-                    , Svg.Attributes.operator "dilate"
-                    , Svg.Attributes.result "DILATED"
-                    , Svg.Attributes.radius "3"
-                    ]
-                    []
-                , Svg.feFlood
-                    [ Svg.Attributes.floodColor "beige"
-                    , Svg.Attributes.floodOpacity "1"
-                    , Svg.Attributes.result "PINK"
-                    ]
-                    []
-                , Svg.feComposite
-                    [ Svg.Attributes.in_ "PINK"
-                    , Svg.Attributes.in2 "DILATED"
-                    , Svg.Attributes.operator "in"
-                    , Svg.Attributes.result "OUTLINE"
-                    ]
-                    []
-                , Svg.feMerge []
-                    [ Svg.feMergeNode [ Svg.Attributes.in_ "OUTLINE" ] []
-                    , Svg.feMergeNode [ Svg.Attributes.in_ "SourceGraphic" ] []
-                    ]
-                ]
+            [ strokeFilter
+            , gooFilter
             ]
-        , viewRadialProgress counter.maxCount counter.count
         , Svg.text_
-            [ Svg.Attributes.filter "url('#outline')"
+            [ Svg.Attributes.filter "url(#outline)"
+            , Svg.Attributes.fontSize "6rem"
             , Svg.Attributes.textAnchor "middle"
-            , Svg.Attributes.dominantBaseline "central"
-            , Svg.Attributes.fontSize "4rem"
+            , Svg.Attributes.dominantBaseline "middle"
             ]
             [ Svg.text counter.icon ]
         ]
