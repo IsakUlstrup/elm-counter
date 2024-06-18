@@ -14,9 +14,9 @@ type ButtonState
     | Holding Float
 
 
-new : String -> Int -> Counter
-new icon maxCount =
-    Counter 0 maxCount Idle icon
+new : String -> Counter
+new icon =
+    Counter 0 20 Idle icon
 
 
 setCount : Int -> Counter -> Counter

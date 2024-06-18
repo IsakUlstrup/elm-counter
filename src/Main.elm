@@ -32,9 +32,12 @@ init : Maybe String -> ( Model, Cmd Msg )
 init _ =
     ( Model
         (Inventory 0 100)
-        (List.range 1 3
-            |> List.map (\_ -> Counter.new "🥥" 100)
-            |> Array.fromList
+        (Array.fromList
+            [ Counter.new "🥥"
+            , Counter.new "🥭"
+            , Counter.new "🍌"
+            , Counter.new "🌴"
+            ]
         )
     , Cmd.none
     )
