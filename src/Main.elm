@@ -191,9 +191,9 @@ viewStrokeIcon counter =
             ]
         , Svg.text_
             [ Svg.Attributes.filter "url(#outline)"
-            , Svg.Attributes.fontSize "6rem"
+            , Svg.Attributes.fontSize "10rem"
             , Svg.Attributes.textAnchor "middle"
-            , Svg.Attributes.dominantBaseline "middle"
+            , Svg.Attributes.dominantBaseline "central"
             ]
             [ Svg.text counter.icon ]
         ]
