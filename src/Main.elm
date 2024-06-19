@@ -92,29 +92,26 @@ update msg model =
 
 
 -- VIEW
-
-
-viewCounterTooltip : Counter -> Html msg
-viewCounterTooltip counter =
-    let
-        isEmpty : Bool
-        isEmpty =
-            counter.count == 0
-
-        isFull : Bool
-        isFull =
-            counter.count == counter.maxCount
-    in
-    Html.div
-        [ Html.Attributes.class "custom-meter2"
-        , Html.Attributes.classList [ ( "empty", isEmpty ), ( "full", isFull ) ]
-        ]
-        [ Html.progress
-            [ Html.Attributes.value (String.fromInt counter.count)
-            , Html.Attributes.max (String.fromInt counter.maxCount)
-            ]
-            []
-        ]
+-- viewCounterTooltip : Counter -> Html msg
+-- viewCounterTooltip counter =
+--     let
+--         isEmpty : Bool
+--         isEmpty =
+--             counter.count == 0
+--         isFull : Bool
+--         isFull =
+--             counter.count == counter.maxCount
+--     in
+--     Html.div
+--         [ Html.Attributes.class "custom-meter2"
+--         , Html.Attributes.classList [ ( "empty", isEmpty ), ( "full", isFull ) ]
+--         ]
+--         [ Html.progress
+--             [ Html.Attributes.value (String.fromInt counter.count)
+--             , Html.Attributes.max (String.fromInt counter.maxCount)
+--             ]
+--             []
+--         ]
 
 
 viewCounter : Int -> Counter -> Html Msg
@@ -126,9 +123,28 @@ viewCounter index button =
         , Html.Attributes.class "button"
         , Html.Attributes.classList [ ( "done", Counter.isDone button ) ]
         ]
-        [ viewCounterTooltip button
-        , viewStrokeIcon button
+        [ viewStrokeIcon button
         ]
+
+
+viewRadialProgress : Int -> Int -> Svg msg
+viewRadialProgress max value =
+    let
+        strokeOffset =
+            100 - (toFloat value / toFloat max * 100)
+    in
+    Svg.circle
+        [ Svg.Attributes.class "radial-progress"
+        , Svg.Attributes.r "90"
+        , Svg.Attributes.stroke "white"
+        , Svg.Attributes.fill "transparent"
+        , Svg.Attributes.strokeWidth "10"
+        , Svg.Attributes.strokeLinecap "round"
+        , Svg.Attributes.pathLength "100"
+        , Svg.Attributes.strokeDasharray "100"
+        , Svg.Attributes.strokeDashoffset (String.fromFloat strokeOffset)
+        ]
+        []
 
 
 viewStrokeIcon : Counter -> Svg msg
@@ -141,9 +157,10 @@ viewStrokeIcon counter =
             [ Filters.outline
             , Filters.goo
             ]
+        , viewRadialProgress counter.maxCount counter.count
         , Svg.text_
             [ Svg.Attributes.filter "url(#outline-filter)"
-            , Svg.Attributes.fontSize "10rem"
+            , Svg.Attributes.fontSize "8rem"
             , Svg.Attributes.textAnchor "middle"
             , Svg.Attributes.dominantBaseline "central"
             ]
