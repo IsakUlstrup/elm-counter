@@ -1,4 +1,4 @@
-module Engine.Counter exposing (ButtonState, Counter, addCount, isDone, isDoneHolding, new, notEmpty, notFull, setCount, setHolding, setIdle, subtractCount, tick, toString)
+module Engine.Counter exposing (ButtonState, Counter, addCount, decayCount, isDone, isDoneHolding, new, notEmpty, notFull, setCount, setHolding, setIdle, subtractCount, tick, toString)
 
 
 type alias Counter =
@@ -60,6 +60,16 @@ addCount button =
 
             else
                 button
+
+
+decayCount : Float -> Counter -> Counter
+decayCount dt counter =
+    case counter.state of
+        Idle ->
+            { counter | count = counter.count - (dt / 2 |> round) |> max 0 }
+
+        Holding _ ->
+            counter
 
 
 subtractCount : Counter -> Counter

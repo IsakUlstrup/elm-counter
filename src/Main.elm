@@ -3,6 +3,7 @@ module Main exposing (Inventory, Model, Msg, main)
 import Array exposing (Array)
 import Browser
 import Browser.Events
+import Dict exposing (Dict)
 import Engine.Counter as Counter exposing (Counter)
 import Filters
 import Html exposing (Html, main_)
@@ -13,10 +14,36 @@ import Svg exposing (Svg)
 import Svg.Attributes
 
 
+
+-- INVENTORY
+
+
 type alias Inventory =
-    { current : Int
-    , max : Int
-    }
+    Dict String Int
+
+
+emptyInventory : Inventory
+emptyInventory =
+    Dict.empty
+
+
+addItem : String -> Inventory -> Inventory
+addItem item inventory =
+    case Dict.get item inventory of
+        Just _ ->
+            Dict.update item (Maybe.map ((+) 1)) inventory
+
+        Nothing ->
+            Dict.insert item 1 inventory
+
+
+addItemIfDone : Counter -> Inventory -> Inventory
+addItemIfDone counter inventory =
+    if Counter.isDone counter then
+        addItem counter.icon inventory
+
+    else
+        inventory
 
 
 
@@ -32,7 +59,7 @@ type alias Model =
 init : Maybe String -> ( Model, Cmd Msg )
 init _ =
     ( Model
-        (Inventory 0 100)
+        emptyInventory
         (Array.fromList
             [ Counter.new "🥥"
             , Counter.new "🥭"
@@ -80,11 +107,10 @@ update msg model =
             ( { model
                 | counters =
                     model.counters
-                        -- |> Array.map (counterTransfer model.inventory)
                         |> Array.map (Counter.tick dt)
                         |> Array.map Counter.addCount
-
-                -- , inventory = Array.foldl inventoryTransfer model.inventory model.counters
+                        |> Array.map (Counter.decayCount dt)
+                , inventory = Array.foldl addItemIfDone model.inventory model.counters
               }
             , Cmd.none
             )
@@ -92,26 +118,6 @@ update msg model =
 
 
 -- VIEW
--- viewCounterTooltip : Counter -> Html msg
--- viewCounterTooltip counter =
---     let
---         isEmpty : Bool
---         isEmpty =
---             counter.count == 0
---         isFull : Bool
---         isFull =
---             counter.count == counter.maxCount
---     in
---     Html.div
---         [ Html.Attributes.class "custom-meter2"
---         , Html.Attributes.classList [ ( "empty", isEmpty ), ( "full", isFull ) ]
---         ]
---         [ Html.progress
---             [ Html.Attributes.value (String.fromInt counter.count)
---             , Html.Attributes.max (String.fromInt counter.maxCount)
---             ]
---             []
---         ]
 
 
 viewCounter : Int -> Counter -> Html Msg
