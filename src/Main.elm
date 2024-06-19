@@ -87,7 +87,7 @@ type Msg
 setHolding : Int -> Int -> Counter -> Counter
 setHolding targetIndex index counter =
     if targetIndex == index then
-        Counter.setHolding counter
+        Counter.press counter
 
     else
         counter
@@ -102,7 +102,7 @@ update msg model =
             )
 
         CounterRelease ->
-            ( { model | counters = Array.map Counter.setIdle model.counters }
+            ( { model | counters = Array.map Counter.release model.counters }
             , Cmd.none
             )
 
@@ -111,6 +111,7 @@ update msg model =
                 | counters =
                     model.counters
                         |> Array.map (Counter.tick dt)
+                        |> Array.map Counter.kill
                         |> Array.map Counter.addCount
                         |> Array.map (Counter.decayCount dt)
                 , inventory = Array.foldl addItemIfDone model.inventory model.counters

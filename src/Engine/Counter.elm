@@ -1,4 +1,16 @@
-module Engine.Counter exposing (ButtonState, Counter, addCount, decayCount, isDone, new, setHolding, setIdle, tick, toString)
+module Engine.Counter exposing
+    ( ButtonState
+    , Counter
+    , addCount
+    , decayCount
+    , isDone
+    , kill
+    , new
+    , press
+    , release
+    , tick
+    , toString
+    )
 
 
 type alias Counter =
@@ -12,6 +24,7 @@ type alias Counter =
 type ButtonState
     = Idle
     | Holding Float
+    | Dead Float
 
 
 new : String -> Counter
@@ -19,14 +32,24 @@ new icon =
     Counter 0 20 Idle icon
 
 
-setIdle : Counter -> Counter
-setIdle button =
-    { button | state = Idle }
+release : Counter -> Counter
+release button =
+    case button.state of
+        Holding _ ->
+            { button | state = Idle }
+
+        _ ->
+            button
 
 
-setHolding : Counter -> Counter
-setHolding button =
-    { button | state = Holding 0 }
+press : Counter -> Counter
+press button =
+    case button.state of
+        Idle ->
+            { button | state = Holding 0 }
+
+        _ ->
+            button
 
 
 tick : Float -> Counter -> Counter
@@ -42,6 +65,25 @@ tick dt button =
             else
                 { button | state = Holding ((time - dt) |> max 0) }
 
+        Dead time ->
+            if time == 0 then
+                { button | state = Idle }
+
+            else
+                { button | state = Dead ((time - dt) |> max 0) }
+
+
+kill : Counter -> Counter
+kill counter =
+    if isDone counter then
+        { counter
+            | state = Dead 5000
+            , count = 0
+        }
+
+    else
+        counter
+
 
 addCount : Counter -> Counter
 addCount button =
@@ -56,6 +98,9 @@ addCount button =
             else
                 button
 
+        Dead _ ->
+            button
+
 
 decayCount : Float -> Counter -> Counter
 decayCount dt counter =
@@ -68,6 +113,9 @@ decayCount dt counter =
                 counter
 
         Holding _ ->
+            counter
+
+        Dead _ ->
             counter
 
 
@@ -84,3 +132,6 @@ toString button =
 
         Holding _ ->
             "holding"
+
+        Dead _ ->
+            "dead"
