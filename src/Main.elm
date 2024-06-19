@@ -63,6 +63,9 @@ init _ =
         (Array.fromList
             [ Counter.new "🥥"
             , Counter.new "🥭"
+            , Counter.new "🌺"
+            , Counter.new "🐝"
+            , Counter.new "🐞"
             , Counter.new "🍌"
             , Counter.new "🌴"
             ]
