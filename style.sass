@@ -30,8 +30,8 @@ $button-color: #e991b8
     -webkit-tap-highlight-color: rgba(0,0,0,0)
     transition: all 200ms ease-out
     background: $button-color
-    box-shadow: 0rem 0.4rem 0rem darken(white, 20%)
-    border: 0.5rem solid white
+    box-shadow: 0rem 0.4rem 0rem darken(beige, 20%)
+    border: 0.5rem solid beige
     border-radius: 1.2rem
     padding: 1rem
 
@@ -40,7 +40,7 @@ $button-color: #e991b8
     justify-content: center
 
     &.holding
-        box-shadow: 0rem 0.2rem 0rem darken(white, 20%)
+        box-shadow: 0rem 0.2rem 0rem darken(beige, 20%)
         transform: translateY(0.2rem)
 
         &:not(.done) .custom-meter2
@@ -67,7 +67,7 @@ $button-color: #e991b8
     fill: #a1f5d6
 // CUSTOM METER
 
-$tooltip-color: white
+$tooltip-color: beige
 
 .custom-meter2
     opacity: 0
@@ -79,7 +79,7 @@ $tooltip-color: white
     padding: 0.25rem
     border-radius: 0.5rem
     transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1)
-    filter: drop-shadow(0rem 0.15rem 0rem darken(white, 20%)) drop-shadow(0rem 0rem 0.75rem black)
+    filter: drop-shadow(0rem 0.15rem 0rem darken(beige, 10%)) drop-shadow(0rem 0rem 0.75rem black)
     transform: translateY(2rem) scale(0.5)
 
     progress[value]

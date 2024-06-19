@@ -147,7 +147,7 @@ viewRadialProgress max value =
     Svg.circle
         [ Svg.Attributes.class "radial-progress"
         , Svg.Attributes.r "90"
-        , Svg.Attributes.stroke "white"
+        , Svg.Attributes.stroke "beige"
         , Svg.Attributes.fill "transparent"
         , Svg.Attributes.strokeWidth "10"
         , Svg.Attributes.strokeLinecap "round"
