@@ -11,7 +11,7 @@ outline =
             [ Svg.Attributes.in_ "SourceGraphic"
             , Svg.Attributes.operator "dilate"
             , Svg.Attributes.result "DILATED"
-            , Svg.Attributes.radius "5"
+            , Svg.Attributes.radius "7"
             ]
             []
         , Svg.feColorMatrix
