@@ -4,14 +4,14 @@ import Svg exposing (Svg)
 import Svg.Attributes
 
 
-outline : Svg msg
-outline =
+outline : String -> Int -> Svg msg
+outline color size =
     Svg.filter [ Svg.Attributes.id "outline-filter" ]
         [ Svg.feMorphology
             [ Svg.Attributes.in_ "SourceGraphic"
             , Svg.Attributes.operator "dilate"
             , Svg.Attributes.result "DILATED"
-            , Svg.Attributes.radius "7"
+            , Svg.Attributes.radius (String.fromInt size)
             ]
             []
         , Svg.feColorMatrix
@@ -22,7 +22,7 @@ outline =
             ]
             []
         , Svg.feFlood
-            [ Svg.Attributes.floodColor "white"
+            [ Svg.Attributes.floodColor color
             , Svg.Attributes.floodOpacity "100"
             , Svg.Attributes.result "BEIGE"
             ]

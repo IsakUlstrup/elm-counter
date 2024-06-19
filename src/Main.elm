@@ -165,7 +165,7 @@ viewStrokeIcon counter =
         , Svg.Attributes.class "icon"
         ]
         [ Svg.defs []
-            [ Filters.outline
+            [ Filters.outline "beige" 7
             , Filters.goo
             ]
         , viewRadialProgress counter.maxCount counter.count
