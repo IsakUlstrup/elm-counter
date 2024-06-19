@@ -66,7 +66,11 @@ decayCount : Float -> Counter -> Counter
 decayCount dt counter =
     case counter.state of
         Idle ->
-            { counter | count = counter.count - (dt / 2 |> round) |> max 0 }
+            if not (isDone counter) then
+                { counter | count = counter.count - (dt / 2 |> round) |> max 0 }
+
+            else
+                counter
 
         Holding _ ->
             counter
