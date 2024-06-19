@@ -139,6 +139,7 @@ viewCounter index button =
 viewRadialProgress : Int -> Int -> Svg msg
 viewRadialProgress max value =
     let
+        strokeOffset : Float
         strokeOffset =
             100 - (toFloat value / toFloat max * 100)
     in

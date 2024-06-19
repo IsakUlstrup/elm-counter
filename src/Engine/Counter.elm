@@ -1,4 +1,4 @@
-module Engine.Counter exposing (ButtonState, Counter, addCount, decayCount, isDone, isDoneHolding, new, notEmpty, notFull, setCount, setHolding, setIdle, subtractCount, tick, toString)
+module Engine.Counter exposing (ButtonState, Counter, addCount, decayCount, isDone, new, setHolding, setIdle, tick, toString)
 
 
 type alias Counter =
@@ -17,11 +17,6 @@ type ButtonState
 new : String -> Counter
 new icon =
     Counter 0 20 Idle icon
-
-
-setCount : Int -> Counter -> Counter
-setCount count counter =
-    { counter | count = clamp 0 counter.maxCount count }
 
 
 setIdle : Counter -> Counter
@@ -76,21 +71,6 @@ decayCount dt counter =
             counter
 
 
-subtractCount : Counter -> Counter
-subtractCount button =
-    { button | count = button.count - 1 |> max 0 }
-
-
-isDoneHolding : Counter -> Bool
-isDoneHolding button =
-    case button.state of
-        Holding time ->
-            time == 0
-
-        _ ->
-            False
-
-
 isDone : Counter -> Bool
 isDone counter =
     counter.count == counter.maxCount
@@ -104,13 +84,3 @@ toString button =
 
         Holding _ ->
             "holding"
-
-
-notEmpty : Counter -> Bool
-notEmpty counter =
-    counter.count > 0
-
-
-notFull : Counter -> Bool
-notFull counter =
-    counter.count < counter.maxCount
