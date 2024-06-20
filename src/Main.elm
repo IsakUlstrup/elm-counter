@@ -179,6 +179,16 @@ viewStrokeIcon counter =
         ]
 
 
+viewItem : ( String, Int ) -> Html msg
+viewItem ( item, amount ) =
+    Html.p [ Html.Attributes.class "item" ] [ Html.text (item ++ " " ++ String.fromInt amount) ]
+
+
+viewInventory : Inventory -> Html msg
+viewInventory inventory =
+    Html.div [ Html.Attributes.class "inventory" ] (Dict.toList inventory |> List.map viewItem)
+
+
 view : Model -> Html Msg
 view model =
     main_ [ Html.Attributes.id "app" ]
@@ -186,6 +196,7 @@ view model =
             [ Html.Attributes.class "counters"
             ]
             (model.counters |> Array.toList |> List.indexedMap viewCounter)
+        , viewInventory model.inventory
         ]
 
 
